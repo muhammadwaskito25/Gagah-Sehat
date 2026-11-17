@@ -35,55 +35,70 @@ export default function CoachProfileForm({ initial }: { initial: Profile | null 
   }
 
   const Select = ({ k, label, options }: { k: string; label: string; options: string[] }) => (
-    <label className="block">
-      <span className="muted">{label}</span>
-      <select className="input mt-1" value={p[k] ?? ''} onChange={(e) => set(k, e.target.value)}>
+    <label className="block px-4 py-3">
+      <span className="field mb-1.5">{label}</span>
+      <select className="input" value={p[k] ?? ''} onChange={(e) => set(k, e.target.value)}>
         {options.map((o) => <option key={o}>{o}</option>)}
       </select>
     </label>
   )
+  const Num = ({ k, label, decimal }: { k: string; label: string; decimal?: boolean }) => (
+    <label className="block">
+      <span className="field mb-1.5">{label}</span>
+      <input className="input num text-center text-lg" inputMode={decimal ? 'decimal' : 'numeric'} value={p[k] ?? ''} onChange={(e) => set(k, num(e.target.value))} />
+    </label>
+  )
+  const Text = ({ k, label, placeholder, area }: { k: string; label: string; placeholder: string; area?: boolean }) => (
+    <label className="block px-4 py-3">
+      <span className="field mb-1.5">{label}</span>
+      {area ? (
+        <textarea className="input resize-none" rows={2} placeholder={placeholder} value={p[k] ?? ''} onChange={(e) => set(k, e.target.value)} />
+      ) : (
+        <input className="input" placeholder={placeholder} value={p[k] ?? ''} onChange={(e) => set(k, e.target.value)} />
+      )}
+    </label>
+  )
 
   return (
-    <form onSubmit={save} className="space-y-4">
-      <div>
-        <h1 className="h1">Data untuk Coach</h1>
-        <p className="muted">Makin lengkap, makin tepat sarannya. Bisa diubah kapan saja</p>
-      </div>
+    <form onSubmit={save} className="space-y-6">
+      <header className="pt-2">
+        <h1 className="title">Data untuk Coach</h1>
+        <p className="muted mt-2">Makin lengkap, makin tepat sarannya. Bisa diubah kapan saja</p>
+      </header>
 
-      <div className="card space-y-3">
-        <Select k="goal" label="Tujuan utama" options={GOALS} />
-        <Select k="gym_experience" label="Pengalaman gym" options={LEVELS} />
-        <Select k="run_experience" label="Pengalaman lari" options={LEVELS} />
-        <Select k="equipment" label="Alat yang tersedia" options={EQUIP} />
-      </div>
+      <section className="space-y-3">
+        <h2 className="section">Tujuan dan level</h2>
+        <div className="list">
+          {Select({ k: 'goal', label: 'Tujuan utama', options: GOALS })}
+          {Select({ k: 'gym_experience', label: 'Pengalaman gym', options: LEVELS })}
+          {Select({ k: 'run_experience', label: 'Pengalaman lari', options: LEVELS })}
+          {Select({ k: 'equipment', label: 'Alat yang tersedia', options: EQUIP })}
+        </div>
+      </section>
 
-      <div className="card grid grid-cols-3 gap-2">
-        <label><span className="muted">Gym/minggu</span>
-          <input className="input mt-1" inputMode="numeric" value={p.gym_days ?? ''} onChange={(e) => set('gym_days', num(e.target.value))} /></label>
-        <label><span className="muted">Lari/minggu</span>
-          <input className="input mt-1" inputMode="numeric" value={p.run_days ?? ''} onChange={(e) => set('run_days', num(e.target.value))} /></label>
-        <label><span className="muted">Menit/sesi</span>
-          <input className="input mt-1" inputMode="numeric" value={p.session_minutes ?? ''} onChange={(e) => set('session_minutes', num(e.target.value))} /></label>
-        <label><span className="muted">Usia</span>
-          <input className="input mt-1" inputMode="numeric" value={p.age ?? ''} onChange={(e) => set('age', num(e.target.value))} /></label>
-        <label><span className="muted">Tinggi (cm)</span>
-          <input className="input mt-1" inputMode="decimal" value={p.height_cm ?? ''} onChange={(e) => set('height_cm', num(e.target.value))} /></label>
-        <label><span className="muted">Berat (kg)</span>
-          <input className="input mt-1" inputMode="decimal" value={p.bodyweight_kg ?? ''} onChange={(e) => set('bodyweight_kg', num(e.target.value))} /></label>
-      </div>
+      <section className="space-y-3">
+        <h2 className="section">Jadwal dan tubuh</h2>
+        <div className="card grid grid-cols-3 gap-3">
+          {Num({ k: 'gym_days', label: 'Gym/minggu' })}
+          {Num({ k: 'run_days', label: 'Lari/minggu' })}
+          {Num({ k: 'session_minutes', label: 'Menit/sesi' })}
+          {Num({ k: 'age', label: 'Usia' })}
+          {Num({ k: 'height_cm', label: 'Tinggi (cm)', decimal: true })}
+          {Num({ k: 'bodyweight_kg', label: 'Berat (kg)', decimal: true })}
+        </div>
+      </section>
 
-      <div className="card space-y-3">
-        <label className="block"><span className="muted">Target gym</span>
-          <input className="input mt-1" placeholder="mis. bench 100 kg, squat 140 kg dalam 6 bulan" value={p.gym_target ?? ''} onChange={(e) => set('gym_target', e.target.value)} /></label>
-        <label className="block"><span className="muted">Target lari</span>
-          <input className="input mt-1" placeholder="mis. 10K 55 menit, atau HM 2:05:00" value={p.run_target ?? ''} onChange={(e) => set('run_target', e.target.value)} /></label>
-        <label className="block"><span className="muted">Cedera / keluhan</span>
-          <textarea className="input mt-1" rows={2} placeholder="mis. lutut kiri kadang nyeri setelah lari > 8 km" value={p.injuries ?? ''} onChange={(e) => set('injuries', e.target.value)} /></label>
-        <label className="block"><span className="muted">Catatan lain</span>
-          <textarea className="input mt-1" rows={2} placeholder="mis. cuma bisa latihan malam, Sabtu bisa long run" value={p.notes ?? ''} onChange={(e) => set('notes', e.target.value)} /></label>
-      </div>
+      <section className="space-y-3">
+        <h2 className="section">Target dan catatan</h2>
+        <div className="list">
+          {Text({ k: 'gym_target', label: 'Target gym', placeholder: 'mis. bench 100 kg dalam 6 bulan' })}
+          {Text({ k: 'run_target', label: 'Target lari', placeholder: 'mis. 10K 55 menit, atau HM 2:05:00' })}
+          {Text({ k: 'injuries', label: 'Cedera atau keluhan', placeholder: 'mis. lutut kiri nyeri setelah lari jauh', area: true })}
+          {Text({ k: 'notes', label: 'Catatan lain', placeholder: 'mis. cuma bisa latihan malam', area: true })}
+        </div>
+      </section>
 
-      <button className="btn-primary w-full" disabled={saving}>{saving ? 'Menyimpan...' : 'Simpan & Lanjut ke Coach'}</button>
+      <button className="btn-dark h-14 w-full" disabled={saving}>{saving ? 'Menyimpan' : 'Simpan dan lihat saran'}</button>
     </form>
   )
 }

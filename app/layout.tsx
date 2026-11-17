@@ -1,16 +1,20 @@
 import type { Metadata, Viewport } from 'next'
+import { Barlow, Barlow_Condensed } from 'next/font/google'
 import './globals.css'
 import BottomNav from '@/components/BottomNav'
 import SWRegister from '@/components/SWRegister'
 
+const body = Barlow({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-body' })
+const display = Barlow_Condensed({ subsets: ['latin'], weight: ['500', '600', '700'], variable: '--font-display' })
+
 export const metadata: Metadata = {
   title: 'Gagah',
   description: 'Catatan progres gym dan lari',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Gagah' },
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Gagah' },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0a0a0a',
+  themeColor: '#F2F3EF',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -19,9 +23,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
-      <body className="min-h-dvh">
-        <main className="mx-auto max-w-lg px-4 pb-28 pt-[max(env(safe-area-inset-top),1rem)]">
+    <html lang="id" className={`${body.variable} ${display.variable}`}>
+      <body className="min-h-dvh font-sans antialiased">
+        <main className="mx-auto max-w-md px-5 pb-32 pt-[max(env(safe-area-inset-top),1.25rem)]">
           {children}
         </main>
         <BottomNav />

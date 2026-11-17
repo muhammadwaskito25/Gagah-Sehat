@@ -5,41 +5,43 @@ import { fmtClock } from '@/lib/format'
 export type WeekPoint = { week: string; km: number }
 export type PacePoint = { date: string; pace: number }
 
-const tip = { background: '#171717', border: '1px solid #404040', borderRadius: 12 }
-const tick = { fill: '#a3a3a3', fontSize: 11 }
+const tip = { background: '#fff', border: '1px solid #E1E3DE', borderRadius: 12, fontSize: 13 }
+const tick = { fill: '#6B7078', fontSize: 11 }
 
 export default function RunCharts({ weeks, paces }: { weeks: WeekPoint[]; paces: PacePoint[] }) {
   return (
     <div className="space-y-3">
-      <div className="card">
-        <h3 className="mb-2 text-sm font-semibold">Jarak per minggu (12 minggu)</h3>
-        <div className="h-44">
+      <section className="card px-0 pb-2">
+        <h3 className="px-4 font-semibold">Jarak per minggu</h3>
+        <p className="px-4 text-sm text-steel">12 minggu terakhir</p>
+        <div className="mt-3 h-44">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weeks} margin={{ top: 5, right: 4, left: -22, bottom: 0 }}>
-              <CartesianGrid stroke="#262626" vertical={false} />
-              <XAxis dataKey="week" tick={tick} tickLine={false} axisLine={false} interval={1} />
-              <YAxis tick={tick} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={tip} cursor={{ fill: '#262626' }} formatter={(v) => [`${Number(v).toFixed(1)} km`, "Jarak"]} />
-              <Bar dataKey="km" fill="#fc4c02" radius={[6, 6, 0, 0]} />
+            <BarChart data={weeks} margin={{ top: 4, right: 16, left: 16, bottom: 0 }}>
+              <CartesianGrid stroke="#E1E3DE" vertical={false} />
+              <XAxis dataKey="week" tick={tick} tickLine={false} axisLine={false} interval={2} />
+              <YAxis hide />
+              <Tooltip contentStyle={tip} cursor={{ fill: '#F2F3EF' }} formatter={(v) => [`${Number(v).toFixed(1)} km`, 'Jarak']} />
+              <Bar dataKey="km" fill="#E5322D" radius={[5, 5, 0, 0]} maxBarSize={18} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </section>
       {paces.length > 1 && (
-        <div className="card">
-          <h3 className="mb-2 text-sm font-semibold">Tren pace (makin rendah makin cepat)</h3>
-          <div className="h-44">
+        <section className="card px-0 pb-2">
+          <h3 className="px-4 font-semibold">Tren pace</h3>
+          <p className="px-4 text-sm text-steel">Garis naik berarti makin cepat</p>
+          <div className="mt-3 h-44">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={paces} margin={{ top: 5, right: 8, left: -10, bottom: 0 }}>
-                <CartesianGrid stroke="#262626" vertical={false} />
-                <XAxis dataKey="date" tick={tick} tickLine={false} axisLine={false} />
-                <YAxis tick={tick} tickLine={false} axisLine={false} reversed domain={['auto', 'auto']} tickFormatter={(v) => fmtClock(Number(v))} />
-                <Tooltip contentStyle={tip} formatter={(v) => [`${fmtClock(Number(v))} /km`, "Pace"]} />
-                <Line type="monotone" dataKey="pace" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 3 }} />
+              <LineChart data={paces} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                <CartesianGrid stroke="#E1E3DE" vertical={false} />
+                <XAxis dataKey="date" tick={tick} tickLine={false} axisLine={false} minTickGap={16} />
+                <YAxis tick={tick} tickLine={false} axisLine={false} reversed domain={['auto', 'auto']} width={44} tickFormatter={(v) => fmtClock(Number(v))} />
+                <Tooltip contentStyle={tip} formatter={(v) => [`${fmtClock(Number(v))} /km`, 'Pace']} />
+                <Line type="monotone" dataKey="pace" stroke="#15181D" strokeWidth={2.5} dot={{ r: 3, fill: '#15181D', strokeWidth: 0 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </section>
       )}
     </div>
   )

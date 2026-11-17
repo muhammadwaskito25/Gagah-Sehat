@@ -23,10 +23,10 @@ export default function CoachApplyButton({ routines }: { routines: ProposedRouti
   }
 
   if (state === 'done') {
-    return <Link href="/routines" className="btn-ghost block text-center">✓ Tersimpan, lihat di Routine</Link>
+    return <Link href="/routines" className="btn-ghost h-14 w-full">Tersimpan, buka Routine</Link>
   }
   return (
-    <button className="btn-primary w-full" disabled={state === 'saving'} onClick={apply}>
+    <button className="btn-primary h-14 w-full" disabled={state === 'saving'} onClick={apply}>
       {state === 'saving' ? 'Menyimpan...' : 'Terapkan jadi routine'}
     </button>
   )

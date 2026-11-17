@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ExerciseChart, { type ExPoint } from '@/components/ExerciseChart'
+import BackLink from '@/components/BackLink'
 import { epley, fmtDate, fmtNum } from '@/lib/format'
 
 type Row = { weight: number; reps: number; set_type: string; workout_id: string; workouts: { started_at: string; name: string } }
@@ -42,45 +43,56 @@ export default async function ExerciseDetail({ params }: { params: Promise<{ id:
   const bestSessionVol = Math.max(0, ...points.map((p) => p.volume))
 
   return (
-    <div className="space-y-4">
-      <Link href="/exercises" className="muted">← Progres</Link>
-      <div>
-        <h1 className="h1">{ex.name}</h1>
-        <p className="muted">{[ex.muscle_group, ex.equipment].filter(Boolean).join(' · ')}</p>
-      </div>
-
-      {points.length ? <ExerciseChart data={points} /> : <p className="muted">Belum ada data</p>}
-
-      <h2 className="font-semibold">🏆 Personal Record</h2>
-      <div className="grid grid-cols-2 gap-2">
-        <Stat label="Beban terberat" value={heaviest ? `${fmtNum(Number(heaviest.weight))} kg` : '-'} sub={heaviest ? `× ${heaviest.reps} reps` : ''} />
-        <Stat label="Est. 1RM terbaik" value={best1rm ? `${fmtNum(best1rm)} kg` : '-'} />
-        <Stat label="Volume set terbaik" value={bestSetVol ? `${fmtNum(Number(bestSetVol.weight))} × ${bestSetVol.reps}` : '-'} />
-        <Stat label="Volume sesi terbaik" value={`${fmtNum(bestSessionVol)} kg`} />
-      </div>
-
-      <h2 className="font-semibold">Riwayat</h2>
-      {[...sessions].reverse().slice(0, 15).map((s, i) => (
-        <div key={i} className="card p-3">
-          <div className="flex justify-between text-sm">
-            <span className="font-medium">{s.name}</span>
-            <span className="muted">{fmtDate(s.started)}</span>
-          </div>
-          <div className="mt-1 text-sm text-neutral-300">
-            {s.sets.map((x) => `${fmtNum(Number(x.weight))}×${x.reps}`).join('  ·  ')}
-          </div>
+    <div className="space-y-6">
+      <header className="space-y-3 pt-2">
+        <BackLink href="/exercises" label="Progres" />
+        <div>
+          <h1 className="title">{ex.name}</h1>
+          <p className="muted mt-2">{[ex.muscle_group, ex.equipment].filter(Boolean).join(', ')}</p>
         </div>
-      ))}
+      </header>
+
+      {points.length ? <ExerciseChart data={points} /> : <div className="card muted text-center">Belum ada data</div>}
+
+      <section className="space-y-3">
+        <h2 className="section">Rekor pribadi</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Stat label="Beban terberat" value={heaviest ? fmtNum(Number(heaviest.weight)) : '-'} unit="kg" sub={heaviest ? `${heaviest.reps} reps` : ''} />
+          <Stat label="Est. 1RM" value={best1rm ? fmtNum(best1rm) : '-'} unit="kg" />
+          <Stat label="Set terbaik" value={bestSetVol ? `${fmtNum(Number(bestSetVol.weight))}×${bestSetVol.reps}` : '-'} />
+          <Stat label="Volume sesi" value={fmtNum(bestSessionVol)} unit="kg" />
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="section">Riwayat</h2>
+        <div className="list">
+          {[...sessions].reverse().slice(0, 15).map((s, i) => (
+            <div key={i} className="px-4 py-3">
+              <div className="flex justify-between gap-3 text-sm">
+                <span className="truncate font-semibold">{s.name}</span>
+                <span className="shrink-0 text-steel">{fmtDate(s.started)}</span>
+              </div>
+              <div className="num mt-1 text-[17px] text-ink/80">
+                {s.sets.map((x) => `${fmtNum(Number(x.weight))}×${x.reps}`).join('   ')}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Stat({ label, value, unit, sub }: { label: string; value: string; unit?: string; sub?: string }) {
   return (
-    <div className="card p-3">
-      <div className="muted">{label}</div>
-      <div className="text-lg font-semibold">{value}</div>
-      {sub && <div className="text-xs text-neutral-400">{sub}</div>}
+    <div className="card">
+      <div className="text-[13px] text-steel">{label}</div>
+      <div className="mt-1 flex items-baseline gap-1">
+        <span className="num text-[28px] leading-none">{value}</span>
+        {unit && <span className="text-sm text-steel">{unit}</span>}
+      </div>
+      {sub && <div className="mt-1 text-xs text-steel">{sub}</div>}
     </div>
   )
 }

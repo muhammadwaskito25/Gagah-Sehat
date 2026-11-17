@@ -45,39 +45,59 @@ export default async function RunsPage({ searchParams }: { searchParams: Promise
     .reduce((m, r) => Math.min(m, r.moving_time_s / (Number(r.distance_m) / 1000)), Infinity)
 
   return (
-    <div className="space-y-4">
-      <h1 className="h1">Lari</h1>
-      {strava === 'connected' && <p className="text-sm text-green-400">Strava terhubung. Tekan Sync untuk tarik data</p>}
-      {strava === 'error' && <p className="text-sm text-red-400">Gagal menghubungkan Strava, coba lagi</p>}
+    <div className="space-y-6">
+      <header className="pt-2">
+        <h1 className="title">Lari</h1>
+      </header>
 
-      <StravaPanel connected={!!tok} />
+      {strava === 'connected' && <p className="card border-plate-green/40 text-sm">Strava tersambung. Tekan Sinkronkan untuk menarik data lari</p>}
+      {strava === 'error' && <p className="card border-plate-red/40 text-sm">Gagal menyambungkan Strava. Coba lagi</p>}
 
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <div className="card p-3"><div className="muted">Total</div><div className="font-semibold">{(total / 1000).toFixed(0)} km</div></div>
-        <div className="card p-3"><div className="muted">Terjauh</div><div className="font-semibold">{(longest / 1000).toFixed(1)} km</div></div>
-        <div className="card p-3"><div className="muted">Pace 5K+</div><div className="font-semibold">{isFinite(best5k) ? fmtPace(best5k, 1000).replace(' /km', '') : '-'}</div></div>
+      <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+        {[
+          ['Total', (total / 1000).toFixed(0), 'km'],
+          ['Terjauh', (longest / 1000).toFixed(1), 'km'],
+          ['Pace 5K+', isFinite(best5k) ? fmtPace(best5k, 1000).replace(' /km', '') : '-', '/km'],
+        ].map(([l, v, u]) => (
+          <div key={l} className="px-4">
+            <div className="text-[13px] text-steel">{l}</div>
+            <div className="mt-0.5 flex items-baseline gap-1"><span className="num text-2xl leading-none">{v}</span><span className="text-sm text-steel">{u}</span></div>
+          </div>
+        ))}
       </div>
 
+      <StravaPanel connected={!!tok} />
       <RunCharts weeks={weeks} paces={paces} />
       <ManualRunForm />
 
-      <h2 className="font-semibold">Aktivitas</h2>
-      {!list.length && <p className="muted">Belum ada data lari</p>}
-      {list.slice(0, 50).map((r) => (
-        <div key={r.id} className="card p-3">
-          <div className="flex justify-between">
-            <span className="font-medium">{r.name ?? 'Lari'}</span>
-            <span className="muted">{fmtDate(r.start_date)}</span>
+      <section className="space-y-3">
+        <h2 className="section">Aktivitas</h2>
+        {!list.length ? (
+          <div className="card py-8 text-center">
+            <p className="font-semibold">Belum ada data lari</p>
+            <p className="muted mt-1">Sambungkan Strava atau catat lari secara manual</p>
           </div>
-          <div className="mt-1 flex flex-wrap gap-x-4 text-sm text-neutral-300">
-            <span>{fmtKm(Number(r.distance_m))}</span>
-            <span>{fmtDuration(r.moving_time_s)}</span>
-            <span>{fmtPace(r.moving_time_s, Number(r.distance_m))}</span>
-            {r.avg_hr && <span>♥ {Math.round(Number(r.avg_hr))}</span>}
-            {r.source === 'strava' && <span className="text-[#fc4c02]">Strava</span>}
+        ) : (
+          <div className="list">
+            {list.slice(0, 50).map((r) => (
+              <div key={r.id} className="row">
+                <span className="h-9 w-[7px] shrink-0 rounded-[3px] bg-plate-red" />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    <span className="truncate font-semibold">{r.name ?? 'Lari'}</span>
+                    {r.source === 'strava' && <span className="tag shrink-0 bg-[#FC4C02]/10 text-[#C23A00]">Strava</span>}
+                  </span>
+                  <span className="block text-sm text-steel">
+                    {fmtKm(Number(r.distance_m))}, {fmtDuration(r.moving_time_s)}, {fmtPace(r.moving_time_s, Number(r.distance_m))}
+                    {r.avg_hr ? `, ${Math.round(Number(r.avg_hr))} bpm` : ''}
+                  </span>
+                </span>
+                <span className="shrink-0 text-sm text-steel">{fmtDate(r.start_date)}</span>
+              </div>
+            ))}
           </div>
-        </div>
-      ))}
+        )}
+      </section>
     </div>
   )
 }

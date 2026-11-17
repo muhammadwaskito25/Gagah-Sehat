@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import DeleteButton from '@/components/DeleteButton'
+import BackLink from '@/components/BackLink'
+import Icon from '@/components/Icon'
 import { epley, fmtDate, fmtDuration, fmtNum } from '@/lib/format'
 
 type SetRow = { position: number; set_index: number; weight: number; reps: number; set_type: string; exercise_id: string; exercises: { name: string } | null }
@@ -43,39 +45,58 @@ export default async function WorkoutDetail({ params }: { params: Promise<{ id: 
   const dur = w.ended_at ? (new Date(w.ended_at).getTime() - new Date(w.started_at).getTime()) / 1000 : 0
 
   return (
-    <div className="space-y-4">
-      <Link href="/history" className="muted">← Riwayat</Link>
-      <div>
-        <h1 className="h1">{w.name}</h1>
-        <p className="muted">{fmtDate(w.started_at)}</p>
-      </div>
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <div className="card p-3"><div className="muted">Durasi</div><div className="font-semibold">{fmtDuration(dur)}</div></div>
-        <div className="card p-3"><div className="muted">Volume</div><div className="font-semibold">{fmtNum(vol)} kg</div></div>
-        <div className="card p-3"><div className="muted">Set</div><div className="font-semibold">{sets.length}</div></div>
+    <div className="space-y-6">
+      <header className="space-y-3 pt-2">
+        <BackLink href="/history" label="Riwayat" />
+        <div>
+          <h1 className="title">{w.name}</h1>
+          <p className="muted mt-2">{fmtDate(w.started_at)}</p>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+        {[
+          ['Durasi', fmtDuration(dur), ''],
+          ['Volume', fmtNum(vol), 'kg'],
+          ['Set', String(sets.length), ''],
+        ].map(([l, v, u]) => (
+          <div key={l} className="px-4">
+            <div className="text-[13px] text-steel">{l}</div>
+            <div className="mt-0.5 flex items-baseline gap-1"><span className="num text-2xl leading-none">{v}</span>{u && <span className="text-sm text-steel">{u}</span>}</div>
+          </div>
+        ))}
       </div>
 
       {groups.map((g, gi) => {
         const prev = bestBefore.get(g.exerciseId)
         let n = 0
         return (
-          <div key={gi} className="card">
-            <Link href={`/exercises/${g.exerciseId}`} className="font-semibold text-blue-400">{g.name}</Link>
-            <div className="mt-2 space-y-1">
+          <section key={gi} className="rounded-[18px] border border-line bg-white">
+            <Link href={`/exercises/${g.exerciseId}`} className="flex items-center justify-between px-4 pb-2 pt-4">
+              <span className="font-display text-[20px] font-semibold">{g.name}</span>
+              <Icon name="right" size={18} className="text-steel" />
+            </Link>
+            <div className="divide-y divide-line px-4 pb-2">
               {g.sets.map((s, i) => {
                 if (s.set_type === 'normal') n++
                 const e = epley(Number(s.weight), s.reps)
                 const isPR = prev ? (Number(s.weight) > prev.w || e > prev.e1rm) && s.set_type !== 'warmup' : false
                 return (
-                  <div key={i} className="flex items-center justify-between text-sm">
-                    <span className="w-8 text-neutral-400">{s.set_type === 'normal' ? n : s.set_type[0].toUpperCase()}</span>
-                    <span className="flex-1">{fmtNum(Number(s.weight))} kg × {s.reps}</span>
-                    {isPR && <span className="rounded-md bg-amber-500/20 px-2 py-0.5 text-xs text-amber-400">🏆 PR</span>}
+                  <div key={i} className="flex items-center gap-3 py-2.5">
+                    <span className={`num w-6 text-lg ${s.set_type === 'warmup' ? 'text-plate-yellow' : 'text-steel'}`}>
+                      {s.set_type === 'normal' ? n : s.set_type[0].toUpperCase()}
+                    </span>
+                    <span className="num flex-1 text-lg">{fmtNum(Number(s.weight))} kg × {s.reps}</span>
+                    {isPR && (
+                      <span className="tag inline-flex items-center gap-1 bg-plate-yellow/20 text-[#8A6700]">
+                        <Icon name="trophy" size={13} />Rekor
+                      </span>
+                    )}
                   </div>
                 )
               })}
             </div>
-          </div>
+          </section>
         )
       })}
 

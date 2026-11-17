@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ExercisePicker from './ExercisePicker'
+import Icon from './Icon'
 import { fmtClock, fmtNum } from '@/lib/format'
 import type { DraftExercise, DraftSet, DraftWorkout, Exercise, PrevSet, RoutineWithExercises, SetType } from '@/lib/types'
 
@@ -175,7 +176,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
     router.push('/')
   }
 
-  if (!draft) return <p className="muted">Memuat...</p>
+  if (!draft) return <p className="muted pt-10 text-center">Memuat...</p>
 
   const elapsed = (now - new Date(draft.startedAt).getTime()) / 1000
   const doneSets = draft.exercises.flatMap((e) => e.sets.filter((s) => s.done))
@@ -183,28 +184,37 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
   const restLeft = rest ? (rest.end - now) / 1000 : 0
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="sticky top-0 z-20 -mx-4 bg-neutral-950/95 px-4 py-2 backdrop-blur">
+    <div className="space-y-4 pb-10">
+      {/* Header lengket */}
+      <div className="sticky top-0 z-20 -mx-5 border-b border-line bg-chalk/95 px-5 pb-3 pt-[max(env(safe-area-inset-top),0.75rem)] backdrop-blur">
         <div className="flex items-center justify-between">
-          <button onClick={discard} className="text-sm text-red-400">Buang</button>
-          <button onClick={finish} disabled={saving} className="btn-primary py-1.5 text-sm">
-            {saving ? 'Menyimpan...' : 'Selesai'}
+          <button onClick={discard} className="btn-soft btn-sm -ml-1 text-plate-red">Buang</button>
+          <span className="num text-xl tabular-nums">{fmtClock(elapsed)}</span>
+          <button onClick={finish} disabled={saving} className="btn-sm btn bg-plate-green text-white">
+            {saving ? 'Menyimpan' : 'Selesai'}
           </button>
-        </div>
-        <input
-          className="mt-2 w-full bg-transparent text-xl font-bold outline-none"
-          value={draft.name}
-          onChange={(e) => update((d) => { d.name = e.target.value })}
-        />
-        <div className="mt-1 flex gap-5 text-sm">
-          <div><span className="muted">Durasi </span><span className="text-blue-400">{fmtClock(elapsed)}</span></div>
-          <div><span className="muted">Volume </span>{fmtNum(volume)} kg</div>
-          <div><span className="muted">Set </span>{doneSets.length}</div>
         </div>
       </div>
 
-      {/* Daftar latihan */}
+      <input
+        aria-label="Nama latihan"
+        className="w-full bg-transparent font-display text-[32px] font-semibold leading-tight tracking-tight outline-none"
+        value={draft.name}
+        onChange={(e) => update((d) => { d.name = e.target.value })}
+      />
+      <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+        <Mini label="Volume" value={`${fmtNum(volume)}`} unit="kg" />
+        <Mini label="Set selesai" value={String(doneSets.length)} />
+        <Mini label="Latihan" value={String(draft.exercises.length)} />
+      </div>
+
+      {draft.exercises.length === 0 && (
+        <div className="card py-10 text-center">
+          <p className="font-semibold">Belum ada latihan</p>
+          <p className="muted mt-1">Tambahkan latihan pertama untuk mulai mencatat set</p>
+        </div>
+      )}
+
       {draft.exercises.map((ex, ei) => (
         <ExerciseBlock
           key={ei}
@@ -237,21 +247,26 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
         />
       ))}
 
-      <button className="btn-primary w-full" onClick={() => setPickerOpen(true)}>+ Tambah Latihan</button>
+      <button className="btn-primary h-14 w-full" onClick={() => setPickerOpen(true)}>
+        <Icon name="plus" size={18} strokeWidth={2.5} />
+        Tambah latihan
+      </button>
 
       {/* Rest timer */}
       {rest && (
-        <div className="fixed inset-x-0 bottom-[72px] z-40 px-4">
-          <div className="mx-auto max-w-lg overflow-hidden rounded-2xl border border-neutral-700 bg-neutral-900 shadow-xl">
-            <div className="h-1 bg-blue-500 transition-all" style={{ width: `${(restLeft / rest.total) * 100}%` }} />
-            <div className="flex items-center justify-between p-3">
-              <button className="btn-ghost py-1.5" onClick={() => setRest({ ...rest, end: rest.end - 15000 })}>-15</button>
-              <div className="text-center">
-                <div className="muted text-xs">Istirahat</div>
-                <div className="text-2xl font-bold tabular-nums">{fmtClock(restLeft)}</div>
+        <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
+          <div className="mx-auto max-w-md overflow-hidden rounded-[20px] bg-ink text-white">
+            <div className="h-1 bg-white/10">
+              <div className="h-1 bg-plate-yellow transition-[width] duration-300" style={{ width: `${Math.max(0, (restLeft / rest.total) * 100)}%` }} />
+            </div>
+            <div className="flex items-center gap-2 p-3">
+              <button className="h-11 w-14 rounded-xl bg-white/10 text-sm font-semibold" onClick={() => setRest({ ...rest, end: rest.end - 15000 })}>-15</button>
+              <div className="flex-1 text-center">
+                <div className="text-xs text-white/60">Istirahat</div>
+                <div className="num text-[30px] leading-none">{fmtClock(restLeft)}</div>
               </div>
-              <button className="btn-ghost py-1.5" onClick={() => setRest({ end: rest.end + 15000, total: rest.total + 15 })}>+15</button>
-              <button className="btn-primary py-1.5" onClick={() => setRest(null)}>Skip</button>
+              <button className="h-11 w-14 rounded-xl bg-white/10 text-sm font-semibold" onClick={() => setRest({ end: rest.end + 15000, total: rest.total + 15 })}>+15</button>
+              <button className="h-11 rounded-xl bg-white px-4 text-sm font-semibold text-ink" onClick={() => setRest(null)}>Lewati</button>
             </div>
           </div>
         </div>
@@ -261,6 +276,20 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
     </div>
   )
 }
+
+function Mini({ label, value, unit }: { label: string; value: string; unit?: string }) {
+  return (
+    <div className="px-4">
+      <div className="text-[13px] text-steel">{label}</div>
+      <div className="mt-0.5 flex items-baseline gap-1">
+        <span className="num text-2xl leading-none">{value}</span>
+        {unit && <span className="text-sm text-steel">{unit}</span>}
+      </div>
+    </div>
+  )
+}
+
+const GRID = 'grid grid-cols-[2.25rem_minmax(0,1fr)_4.5rem_4rem_2.75rem] items-center gap-2'
 
 function ExerciseBlock({
   ex, onChangeSet, onToggle, onCycleType, onAddSet, onRemoveSet, onRest, onRemove, onMove,
@@ -279,24 +308,27 @@ function ExerciseBlock({
   let normalNo = 0
 
   return (
-    <div className="card p-3">
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="font-semibold text-blue-400">{ex.name}</h3>
-        <button className="px-2 text-neutral-400" onClick={() => setMenu(!menu)}>•••</button>
+    <section className="rounded-[18px] border border-line bg-white">
+      <div className="flex items-center justify-between gap-2 px-4 pb-2 pt-4">
+        <h3 className="min-w-0 truncate font-display text-[22px] font-semibold leading-tight">{ex.name}</h3>
+        <button aria-label="Opsi latihan" className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-steel active:bg-chalk" onClick={() => setMenu(!menu)}>
+          <Icon name="more" size={20} />
+        </button>
       </div>
 
       {menu && (
-        <div className="mb-3 flex flex-wrap gap-2 text-sm">
-          <button className="btn-ghost py-1" onClick={() => onMove(-1)}>↑ Naik</button>
-          <button className="btn-ghost py-1" onClick={() => onMove(1)}>↓ Turun</button>
-          <button className="btn-ghost py-1 text-red-400" onClick={onRemove}>Hapus latihan</button>
+        <div className="mx-4 mb-3 grid grid-cols-3 gap-2">
+          <button className="btn-soft btn-sm" onClick={() => onMove(-1)}><Icon name="up" size={16} />Naik</button>
+          <button className="btn-soft btn-sm" onClick={() => onMove(1)}><Icon name="down" size={16} />Turun</button>
+          <button className="btn-soft btn-sm text-plate-red" onClick={onRemove}><Icon name="trash" size={16} />Hapus</button>
         </div>
       )}
 
-      <label className="muted mb-2 flex items-center gap-2">
-        ⏱ Rest
+      <label className="mx-4 mb-3 inline-flex items-center gap-2 rounded-full bg-chalk py-1 pl-3 pr-1 text-[13px] text-steel">
+        <Icon name="timer" size={15} />
+        Istirahat
         <select
-          className="rounded-lg bg-neutral-800 px-2 py-1 text-neutral-100"
+          className="rounded-full bg-white px-2 py-1 font-semibold text-ink outline-none"
           value={ex.rest}
           onChange={(e) => onRest(Number(e.target.value))}
         >
@@ -306,60 +338,68 @@ function ExerciseBlock({
         </select>
       </label>
 
-      <div className="grid grid-cols-[2.2rem_1fr_4.2rem_3.6rem_2.4rem] items-center gap-1.5 text-xs text-neutral-400">
-        <div className="text-center">SET</div>
-        <div>SEBELUMNYA</div>
-        <div className="text-center">KG</div>
-        <div className="text-center">REPS</div>
-        <div className="text-center">✓</div>
+      <div className={`${GRID} px-3 pb-1 text-[12px] font-medium text-steel`}>
+        <div className="text-center">Set</div>
+        <div>Sebelumnya</div>
+        <div className="text-center">kg</div>
+        <div className="text-center">Reps</div>
+        <div />
       </div>
 
-      {ex.sets.map((s, si) => {
-        if (s.type === 'normal') normalNo++
-        const p = ex.prev[si]
-        const label = s.type === 'normal' ? String(normalNo) : TYPE_LABEL[s.type]
-        const labelColor =
-          s.type === 'warmup' ? 'text-amber-400' : s.type === 'drop' ? 'text-purple-400' : s.type === 'failure' ? 'text-red-400' : ''
-        return (
-          <div
-            key={si}
-            className={`mt-1 grid grid-cols-[2.2rem_1fr_4.2rem_3.6rem_2.4rem] items-center gap-1.5 rounded-lg py-1 ${s.done ? 'bg-green-500/15' : ''}`}
-          >
-            <button className={`text-center font-semibold ${labelColor}`} onClick={() => onCycleType(si)} onDoubleClick={() => onRemoveSet(si)}>
-              {label}
-            </button>
-            <div className="truncate text-sm text-neutral-500">{p ? `${fmtNum(p.weight)}kg × ${p.reps}` : '-'}</div>
-            <input
-              inputMode="decimal"
-              className="rounded-lg bg-neutral-800 py-1.5 text-center outline-none"
-              placeholder={p ? String(p.weight) : '0'}
-              value={s.weight}
-              onChange={(e) => onChangeSet(si, { weight: e.target.value.replace(',', '.') })}
-            />
-            <input
-              inputMode="numeric"
-              className="rounded-lg bg-neutral-800 py-1.5 text-center outline-none"
-              placeholder={p ? String(p.reps) : '0'}
-              value={s.reps}
-              onChange={(e) => onChangeSet(si, { reps: e.target.value })}
-            />
-            <button
-              onClick={() => onToggle(si)}
-              className={`mx-auto flex h-8 w-8 items-center justify-center rounded-lg ${s.done ? 'bg-green-500 text-white' : 'bg-neutral-800 text-neutral-500'}`}
-            >
-              ✓
-            </button>
-          </div>
-        )
-      })}
+      <div className="px-1.5">
+        {ex.sets.map((s, si) => {
+          if (s.type === 'normal') normalNo++
+          const p = ex.prev[si]
+          const label = s.type === 'normal' ? String(normalNo) : TYPE_LABEL[s.type]
+          const labelCls =
+            s.type === 'warmup' ? 'text-plate-yellow' : s.type === 'drop' ? 'text-plate-blue' : s.type === 'failure' ? 'text-plate-red' : 'text-ink'
+          return (
+            <div key={si} className={`${GRID} rounded-xl px-1.5 py-1.5 transition-colors ${s.done ? 'bg-plate-green/10' : ''}`}>
+              <button
+                aria-label="Ganti tipe set"
+                className={`num h-9 rounded-lg text-lg ${labelCls}`}
+                onClick={() => onCycleType(si)}
+                onDoubleClick={() => onRemoveSet(si)}
+              >
+                {label}
+              </button>
+              <div className="truncate text-sm text-steel">{p ? `${fmtNum(p.weight)} × ${p.reps}` : '—'}</div>
+              <input
+                inputMode="decimal"
+                aria-label="Beban kg"
+                className={`num h-10 w-full rounded-lg text-center text-lg outline-none ${s.done ? 'bg-transparent' : 'bg-chalk'} placeholder:text-steel/50`}
+                placeholder={p ? String(p.weight) : '0'}
+                value={s.weight}
+                onChange={(e) => onChangeSet(si, { weight: e.target.value.replace(',', '.') })}
+              />
+              <input
+                inputMode="numeric"
+                aria-label="Repetisi"
+                className={`num h-10 w-full rounded-lg text-center text-lg outline-none ${s.done ? 'bg-transparent' : 'bg-chalk'} placeholder:text-steel/50`}
+                placeholder={p ? String(p.reps) : '0'}
+                value={s.reps}
+                onChange={(e) => onChangeSet(si, { reps: e.target.value })}
+              />
+              <button
+                aria-label={s.done ? 'Batalkan set' : 'Selesaikan set'}
+                onClick={() => onToggle(si)}
+                className={`flex h-10 w-10 items-center justify-center justify-self-center rounded-xl transition ${s.done ? 'bg-plate-green text-white' : 'border border-line text-steel'}`}
+              >
+                <Icon name="check" size={18} strokeWidth={2.6} />
+              </button>
+            </div>
+          )
+        })}
+      </div>
 
-      <div className="mt-2 flex gap-2">
-        <button className="btn-ghost flex-1 py-1.5 text-sm" onClick={onAddSet}>+ Tambah Set</button>
+      <div className="flex gap-2 p-3 pt-2">
+        <button className="btn-soft btn-sm flex-1" onClick={onAddSet}><Icon name="plus" size={16} />Tambah set</button>
         {ex.sets.length > 0 && (
-          <button className="btn-ghost py-1.5 text-sm text-red-400" onClick={() => onRemoveSet(ex.sets.length - 1)}>− Set</button>
+          <button aria-label="Hapus set terakhir" className="btn-soft btn-sm px-4 text-steel" onClick={() => onRemoveSet(ex.sets.length - 1)}>
+            <Icon name="x" size={16} />
+          </button>
         )}
       </div>
-      <p className="mt-1 text-[11px] text-neutral-500">Tap nomor set untuk ganti tipe (W warm-up, D drop, F failure)</p>
-    </div>
+    </section>
   )
 }

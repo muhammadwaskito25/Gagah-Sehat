@@ -31,29 +31,41 @@ export default function LoginPage() {
       setMode('in')
       return setMsg('Akun dibuat, tapi perlu konfirmasi email dulu. Cek inbox/spam, lalu Masuk')
     }
-    // Tunggu sebentar agar cookie sesi ter-set oleh browser sebelum redirect
     setMsg('Berhasil, membuka app...')
     await new Promise((r) => setTimeout(r, 300))
     window.location.replace('/')
   }
 
   return (
-    <div className="flex min-h-[80dvh] flex-col justify-center gap-6">
+    <div className="flex min-h-[88dvh] flex-col justify-between pt-10">
       <div>
-        <h1 className="text-3xl font-bold">Gagah</h1>
-        <p className="muted">Catatan gym dan lari</p>
+        <div className="mb-10 flex h-14 w-14 items-center justify-center rounded-full bg-plate-blue">
+          <span className="h-4 w-4 rounded-full bg-chalk" />
+        </div>
+        <h1 className="font-display text-[56px] font-bold leading-[0.9] tracking-tight">Gagah</h1>
+        <p className="mt-3 max-w-[16rem] text-[17px] leading-snug text-steel">Catat angkatan, pantau lari, lihat dirimu makin kuat tiap minggu</p>
       </div>
-      <form onSubmit={submit} className="space-y-3">
-        <input className="input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
-        <button className="btn-primary w-full" disabled={loading}>
-          {loading ? 'Tunggu...' : mode === 'in' ? 'Masuk' : 'Daftar'}
+
+      <div>
+        <form onSubmit={submit} className="space-y-3">
+          <label className="block">
+            <span className="field mb-1.5">Email</span>
+            <input className="input" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+          <label className="block">
+            <span className="field mb-1.5">Password</span>
+            <input className="input" type="password" autoComplete={mode === 'in' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+          </label>
+          {msg && <p className="rounded-xl bg-white px-3.5 py-3 text-sm text-ink ring-1 ring-line">{msg}</p>}
+          <button className="btn-dark mt-2 w-full" disabled={loading}>
+            {loading ? 'Tunggu...' : mode === 'in' ? 'Masuk' : 'Buat akun'}
+          </button>
+        </form>
+        <button className="mt-5 w-full text-center text-sm text-steel" onClick={() => { setMode(mode === 'in' ? 'up' : 'in'); setMsg('') }}>
+          {mode === 'in' ? 'Belum punya akun? ' : 'Sudah punya akun? '}
+          <span className="font-semibold text-ink underline underline-offset-4">{mode === 'in' ? 'Daftar' : 'Masuk'}</span>
         </button>
-      </form>
-      {msg && <p className="text-sm text-amber-400">{msg}</p>}
-      <button className="muted underline" onClick={() => setMode(mode === 'in' ? 'up' : 'in')}>
-        {mode === 'in' ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk'}
-      </button>
+      </div>
     </div>
   )
 }
