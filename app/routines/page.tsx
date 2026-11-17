@@ -31,6 +31,7 @@ export default async function RoutinesPage() {
           <p className="muted mx-auto mt-1 max-w-[16rem]">Bikin template seperti Push, Pull, atau Legs biar tinggal mulai</p>
           <div className="mt-4 flex justify-center gap-2">
             <Link href="/routines/new" className="btn-dark btn-sm">Buat routine</Link>
+            <Link href="/import" className="btn-ghost btn-sm">Impor dari Hevy</Link>
           </div>
         </div>
       )}

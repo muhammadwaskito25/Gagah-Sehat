@@ -53,6 +53,11 @@ export default async function ProfilePage() {
           <span className="flex-1 font-medium">Riwayat latihan</span>
           <Icon name="right" size={18} className="text-steel" />
         </Link>
+        <Link href="/import" className="row">
+          <Icon name="up" size={20} className="text-steel" />
+          <span className="flex-1 font-medium">Impor dari Hevy</span>
+          <Icon name="right" size={18} className="text-steel" />
+        </Link>
         <Link href="/runs" className="row">
           <Icon name="run" size={20} className="text-steel" />
           <span className="flex-1 font-medium">Lari</span>
