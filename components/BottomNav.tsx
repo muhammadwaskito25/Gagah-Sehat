@@ -8,7 +8,6 @@ const items = [
   { href: '/routines', label: 'Routine', icon: 'list' },
   { href: '/runs', label: 'Lari', icon: 'run' },
   { href: '/exercises', label: 'Progres', icon: 'chart' },
-  { href: '/coach', label: 'Coach', icon: 'coach' },
 ]
 
 export default function BottomNav() {
@@ -18,7 +17,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
-      <div className="relative mx-auto grid max-w-md grid-cols-[1fr_1fr_76px_1fr_1fr_1fr] items-end px-2">
+      <div className="relative mx-auto grid max-w-md grid-cols-[1fr_1fr_76px_1fr_1fr] items-end px-2">
         {items.slice(0, 2).map((it) => <Item key={it.href} {...it} active={isActive(it.href)} />)}
         <Link
           href="/workout"

@@ -77,14 +77,6 @@ export default async function Home() {
         <Link href="/routines" className="btn-ghost h-14"><Icon name="list" size={18} />Pilih routine</Link>
       </section>
 
-      <Link href="/coach" className="card flex items-center gap-4">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-chalk text-plate-blue"><Icon name="coach" size={20} /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-semibold">Coach</span>
-          <span className="block truncate text-sm text-steel">Target sesi berikutnya dan evaluasi programmu</span>
-        </span>
-        <Icon name="right" size={18} className="text-steel" />
-      </Link>
 
       <section className="space-y-3">
         <h2 className="section">Terakhir</h2>

@@ -28,10 +28,9 @@ export default async function RoutinesPage() {
       {!routines?.length && (
         <div className="card py-10 text-center">
           <p className="font-semibold">Belum ada routine</p>
-          <p className="muted mx-auto mt-1 max-w-[16rem]">Bikin template seperti Push, Pull, Legs, atau minta Coach menyusunkannya</p>
+          <p className="muted mx-auto mt-1 max-w-[16rem]">Bikin template seperti Push, Pull, atau Legs biar tinggal mulai</p>
           <div className="mt-4 flex justify-center gap-2">
             <Link href="/routines/new" className="btn-dark btn-sm">Buat routine</Link>
-            <Link href="/coach" className="btn-ghost btn-sm">Buka Coach</Link>
           </div>
         </div>
       )}

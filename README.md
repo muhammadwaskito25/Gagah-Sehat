@@ -10,7 +10,6 @@ Next.js 15 (App Router) + Supabase + Tailwind, bisa di-install di HP sebagai PWA
 - Halaman progres per latihan: grafik Est. 1RM, beban terberat, volume, reps, plus Personal Record
 - Badge 🏆 PR otomatis di detail latihan
 - Lari: sync dari Strava (Run, Trail Run, Virtual Run), grafik km per minggu, tren pace, input manual juga bisa
-- **Coach otomatis (gratis, tanpa AI)**: isi data diri dan target, lalu coach menganalisis data gym + lari: target beban/reps sesi berikutnya, latihan yang stagnan, volume per otot, saran deload, kenaikan km lari, rasio easy/keras, zona pace, prediksi waktu target lari, jadwal mingguan, dan program gym yang bisa diterapkan 1 klik
 - Beranda: ringkasan minggu ini dan aktivitas terakhir gabungan gym + lari
 
 ## Setup
@@ -28,11 +27,7 @@ Next.js 15 (App Router) + Supabase + Tailwind, bisa di-install di HP sebagai PWA
 2. *Authorization Callback Domain*: isi `localhost` untuk development (nanti ganti ke domain Vercel, mis. `liftrun-dzhe.vercel.app`)
 3. Salin `Client ID` dan `Client Secret`
 
-### 3. Coach
-
-Jalankan juga `supabase/coach.sql` di SQL Editor. Coach 100% gratis, tidak pakai API AI
-
-### 3b. Jalankan lokal
+### 3. Jalankan lokal
 
 ```bash
 npm install
