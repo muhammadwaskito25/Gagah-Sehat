@@ -21,8 +21,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session supaya cookie tidak expired — WAJIB sebelum getUser
-  await supabase.auth.getSession()
+  // getUser sekaligus me-refresh sesi yang hampir kedaluwarsa
   const { data: { user } } = await supabase.auth.getUser()
 
   const path = request.nextUrl.pathname

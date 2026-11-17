@@ -47,3 +47,16 @@ export function startOfWeekISO(d = new Date()) {
   wib.setUTCHours(0, 0, 0, 0)
   return new Date(wib.getTime() - 7 * 3600 * 1000).toISOString()
 }
+
+// Menit desimal untuk input cardio, mis. 900 detik -> "15"
+export function fmtMinutes(sec?: number | null) {
+  if (!sec) return ''
+  return String(Math.round((sec / 60) * 10) / 10)
+}
+
+export function fmtCardio(distanceM?: number | null, durationS?: number | null) {
+  const parts: string[] = []
+  if (distanceM) parts.push(`${Math.round((distanceM / 1000) * 100) / 100} km`)
+  if (durationS) parts.push(`${fmtMinutes(durationS)} mnt`)
+  return parts.join(', ') || '-'
+}

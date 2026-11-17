@@ -11,7 +11,7 @@ const items = [
 
 export default function BottomNav() {
   const path = usePathname()
-  if (path.startsWith('/login') || path.startsWith('/workout')) return null
+  if (['/login', '/workout', '/routines/', '/runs/start', '/runs/routines', '/import'].some((x) => path.startsWith(x))) return null
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white pb-[env(safe-area-inset-bottom)]">

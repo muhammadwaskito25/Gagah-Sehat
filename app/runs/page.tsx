@@ -1,14 +1,16 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import StravaPanel from '@/components/StravaPanel'
 import ManualRunForm from '@/components/ManualRunForm'
 import RunCharts, { type PacePoint, type WeekPoint } from '@/components/RunCharts'
+import { runTypeLabel } from '@/lib/run'
 import { fmtDate, fmtDuration, fmtKm, fmtPace, startOfWeekISO } from '@/lib/format'
 
 export default async function RunsPage({ searchParams }: { searchParams: Promise<{ strava?: string }> }) {
   const { strava } = await searchParams
   const supabase = await createClient()
   const [{ data: runs }, { data: tok }] = await Promise.all([
-    supabase.from('runs').select('*').order('start_date', { ascending: false }),
+    supabase.from('runs').select('*, run_routines(name,run_type)').order('start_date', { ascending: false }),
     supabase.from('strava_tokens').select('athlete_id').maybeSingle(),
   ])
   const list = runs ?? []
@@ -66,6 +68,11 @@ export default async function RunsPage({ searchParams }: { searchParams: Promise
         ))}
       </div>
 
+      <div className="grid grid-cols-2 gap-3">
+        <Link href="/runs/start" className="btn h-12 bg-plate-red text-white">Mulai lari</Link>
+        <Link href="/routines" className="btn-ghost h-12">Routine lari</Link>
+      </div>
+
       <StravaPanel connected={!!tok} />
       <RunCharts weeks={weeks} paces={paces} />
       <ManualRunForm />
@@ -86,11 +93,13 @@ export default async function RunsPage({ searchParams }: { searchParams: Promise
                   <span className="flex items-center gap-2">
                     <span className="truncate font-semibold">{r.name ?? 'Lari'}</span>
                     {r.source === 'strava' && <span className="tag shrink-0 bg-[#FC4C02]/10 text-[#C23A00]">Strava</span>}
+                    {r.run_routines && <span className="tag shrink-0 bg-plate-red/10 text-plate-red">{runTypeLabel(r.run_routines.run_type)}</span>}
                   </span>
                   <span className="block text-sm text-steel">
                     {fmtKm(Number(r.distance_m))}, {fmtDuration(r.moving_time_s)}, {fmtPace(r.moving_time_s, Number(r.distance_m))}
                     {r.avg_hr ? `, ${Math.round(Number(r.avg_hr))} bpm` : ''}
                   </span>
+                  {r.notes && <span className="block truncate text-[13px] text-steel/80">{r.notes}</span>}
                 </span>
                 <span className="shrink-0 text-sm text-steel">{fmtDate(r.start_date)}</span>
               </div>

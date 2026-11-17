@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ExercisePicker from './ExercisePicker'
 import Icon from './Icon'
-import { fmtClock, fmtNum } from '@/lib/format'
+import { fmtCardio, fmtClock, fmtNum } from '@/lib/format'
 import type { DraftExercise, DraftSet, DraftWorkout, Exercise, PrevSet, RoutineWithExercises, SetType } from '@/lib/types'
 
 const KEY = 'liftrun-active-workout'
@@ -27,7 +27,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
     async (exerciseId: string): Promise<PrevSet[]> => {
       const { data } = await supabase
         .from('workout_sets')
-        .select('weight,reps,set_index,workout_id')
+        .select('weight,reps,set_index,workout_id,distance_m,duration_s')
         .eq('exercise_id', exerciseId)
         .order('created_at', { ascending: false })
         .limit(30)
@@ -36,7 +36,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
       return data
         .filter((s) => s.workout_id === lastId)
         .sort((a, b) => a.set_index - b.set_index)
-        .map((s) => ({ weight: Number(s.weight), reps: s.reps }))
+        .map((s) => ({ weight: Number(s.weight), reps: s.reps, distance: s.distance_m ? Number(s.distance_m) : null, duration: s.duration_s }))
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -62,6 +62,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
           items.map(async (re) => ({
             exerciseId: re.exercise_id,
             name: re.exercises?.name ?? 'Latihan',
+            kind: re.exercises?.kind ?? 'strength',
             rest: re.rest_seconds,
             sets: Array.from({ length: re.target_sets }, emptySet),
             prev: await fetchPrev(re.exercise_id),
@@ -105,7 +106,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
     const prev = await fetchPrev(ex.id)
     const sets = Array.from({ length: Math.max(prev.length, 1) }, emptySet)
     update((d) => {
-      d.exercises.push({ exerciseId: ex.id, name: ex.name, rest: 90, sets, prev })
+      d.exercises.push({ exerciseId: ex.id, name: ex.name, kind: ex.kind ?? 'strength', rest: ex.kind === 'cardio' ? 0 : 90, sets, prev })
     })
   }
 
@@ -118,8 +119,13 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
       const p = d.exercises[ei].prev[si]
       // Kalau kosong, isi otomatis dari sesi sebelumnya
       if (willBeDone && p) {
-        if (s.weight === '') s.weight = String(p.weight)
-        if (s.reps === '') s.reps = String(p.reps)
+        if (d.exercises[ei].kind === 'cardio') {
+          if (!s.distance && p.distance) s.distance = String(Math.round((p.distance / 1000) * 100) / 100)
+          if (!s.duration && p.duration) s.duration = String(Math.round((p.duration / 60) * 10) / 10)
+        } else {
+          if (s.weight === '') s.weight = String(p.weight)
+          if (s.reps === '') s.reps = String(p.reps)
+        }
       }
       s.done = willBeDone
     })
@@ -138,9 +144,11 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
           exercise_id: ex.exerciseId,
           position: ei,
           set_index: si,
-          weight: Number(s.weight) || 0,
-          reps: Number(s.reps) || 0,
+          weight: ex.kind === 'cardio' ? 0 : Number(s.weight) || 0,
+          reps: ex.kind === 'cardio' ? 0 : Number(s.reps) || 0,
           set_type: s.type,
+          distance_m: ex.kind === 'cardio' && s.distance ? Number(s.distance.replace(',', '.')) * 1000 : null,
+          duration_s: ex.kind === 'cardio' && s.duration ? Math.round(Number(s.duration.replace(',', '.')) * 60) : null,
         }))
     )
     if (!rows.length) return alert('Belum ada set yang dicentang')
@@ -305,6 +313,7 @@ function ExerciseBlock({
   onMove: (dir: -1 | 1) => void
 }) {
   const [menu, setMenu] = useState(false)
+  const cardio = ex.kind === 'cardio'
   let normalNo = 0
 
   return (
@@ -341,8 +350,8 @@ function ExerciseBlock({
       <div className={`${GRID} px-3 pb-1 text-[12px] font-medium text-steel`}>
         <div className="text-center">Set</div>
         <div>Sebelumnya</div>
-        <div className="text-center">kg</div>
-        <div className="text-center">Reps</div>
+        <div className="text-center">{cardio ? 'km' : 'kg'}</div>
+        <div className="text-center">{cardio ? 'Menit' : 'Reps'}</div>
         <div />
       </div>
 
@@ -363,22 +372,22 @@ function ExerciseBlock({
               >
                 {label}
               </button>
-              <div className="truncate text-sm text-steel">{p ? `${fmtNum(p.weight)} × ${p.reps}` : '—'}</div>
+              <div className="truncate text-sm text-steel">{p ? (cardio ? fmtCardio(p.distance, p.duration) : `${fmtNum(p.weight)} × ${p.reps}`) : '—'}</div>
               <input
                 inputMode="decimal"
-                aria-label="Beban kg"
+                aria-label={cardio ? 'Jarak km' : 'Beban kg'}
                 className={`num h-10 w-full rounded-lg text-center text-lg outline-none ${s.done ? 'bg-transparent' : 'bg-chalk'} placeholder:text-steel/50`}
-                placeholder={p ? String(p.weight) : '0'}
-                value={s.weight}
-                onChange={(e) => onChangeSet(si, { weight: e.target.value.replace(',', '.') })}
+                placeholder={cardio ? (p?.distance ? String(Math.round((p.distance / 1000) * 100) / 100) : '0') : p ? String(p.weight) : '0'}
+                value={cardio ? s.distance ?? '' : s.weight}
+                onChange={(e) => onChangeSet(si, cardio ? { distance: e.target.value.replace(',', '.') } : { weight: e.target.value.replace(',', '.') })}
               />
               <input
-                inputMode="numeric"
-                aria-label="Repetisi"
+                inputMode={cardio ? 'decimal' : 'numeric'}
+                aria-label={cardio ? 'Durasi menit' : 'Repetisi'}
                 className={`num h-10 w-full rounded-lg text-center text-lg outline-none ${s.done ? 'bg-transparent' : 'bg-chalk'} placeholder:text-steel/50`}
-                placeholder={p ? String(p.reps) : '0'}
-                value={s.reps}
-                onChange={(e) => onChangeSet(si, { reps: e.target.value })}
+                placeholder={cardio ? (p?.duration ? String(Math.round((p.duration / 60) * 10) / 10) : '0') : p ? String(p.reps) : '0'}
+                value={cardio ? s.duration ?? '' : s.reps}
+                onChange={(e) => onChangeSet(si, cardio ? { duration: e.target.value.replace(',', '.') } : { reps: e.target.value })}
               />
               <button
                 aria-label={s.done ? 'Batalkan set' : 'Selesaikan set'}

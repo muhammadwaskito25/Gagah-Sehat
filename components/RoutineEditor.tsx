@@ -6,7 +6,7 @@ import ExercisePicker from './ExercisePicker'
 import Icon from './Icon'
 import type { Exercise, RoutineWithExercises } from '@/lib/types'
 
-type Item = { exerciseId: string; name: string; sets: number; reps: string; rest: number }
+type Item = { exerciseId: string; name: string; sets: number; reps: string; rest: number; kind?: string | null }
 
 export default function RoutineEditor({ initial }: { initial: RoutineWithExercises | null }) {
   const supabase = createClient()
@@ -18,6 +18,7 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
       .map((re) => ({
         exerciseId: re.exercise_id,
         name: re.exercises?.name ?? '',
+        kind: re.exercises?.kind ?? 'strength',
         sets: re.target_sets,
         reps: re.target_reps ?? '',
         rest: re.rest_seconds,
@@ -119,7 +120,7 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
               <input className="input num py-2.5 text-center text-lg" inputMode="numeric" value={it.sets} onChange={(e) => patch(i, { sets: Number(e.target.value) || 0 })} />
             </label>
             <label>
-              <span className="field mb-1">Target reps</span>
+              <span className="field mb-1">{it.kind === 'cardio' ? 'Target' : 'Target reps'}</span>
               <input className="input num py-2.5 text-center text-lg" value={it.reps} onChange={(e) => patch(i, { reps: e.target.value })} />
             </label>
             <label>
@@ -138,7 +139,9 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
         onClose={() => setPicker(false)}
         onPick={(ex: Exercise) => {
           setPicker(false)
-          setItems([...items, { exerciseId: ex.id, name: ex.name, sets: 3, reps: '8-12', rest: 90 }])
+          setItems([...items, ex.kind === 'cardio'
+            ? { exerciseId: ex.id, name: ex.name, sets: 1, reps: '15 mnt', rest: 0, kind: 'cardio' }
+            : { exerciseId: ex.id, name: ex.name, sets: 3, reps: '8-12', rest: 90, kind: 'strength' }])
         }}
       />
     </div>

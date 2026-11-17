@@ -2,26 +2,28 @@
 import { useState } from 'react'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-export type ExPoint = { date: string; e1rm: number; maxWeight: number; volume: number; bestReps: number }
+export type ExPoint = { date: string } & Record<string, number | string>
+export type Metric = { key: string; label: string; unit: string }
 
-const METRICS = [
+const STRENGTH: Metric[] = [
   { key: 'e1rm', label: 'Est. 1RM', unit: 'kg' },
   { key: 'maxWeight', label: 'Beban', unit: 'kg' },
   { key: 'volume', label: 'Volume', unit: 'kg' },
   { key: 'bestReps', label: 'Reps', unit: '' },
-] as const
+]
 
-export default function ExerciseChart({ data }: { data: ExPoint[] }) {
-  const [metric, setMetric] = useState<(typeof METRICS)[number]['key']>('e1rm')
-  const m = METRICS.find((x) => x.key === metric)!
-  const last = data[data.length - 1]?.[metric] ?? 0
-  const first = data[0]?.[metric] ?? 0
+export default function ExerciseChart({ data, metrics = STRENGTH }: { data: ExPoint[]; metrics?: Metric[] }) {
+  const METRICS = metrics
+  const [metric, setMetric] = useState(metrics[0].key)
+  const m = METRICS.find((x) => x.key === metric) ?? METRICS[0]
+  const last = Number(data[data.length - 1]?.[metric] ?? 0)
+  const first = Number(data[0]?.[metric] ?? 0)
   const diff = first ? ((last - first) / first) * 100 : 0
 
   return (
     <section className="card px-0 pb-2">
       <div className="px-4">
-        <div className="grid grid-cols-4 gap-1 rounded-xl bg-chalk p-1">
+        <div className="grid gap-1 rounded-xl bg-chalk p-1" style={{ gridTemplateColumns: `repeat(${METRICS.length}, minmax(0, 1fr))` }}>
           {METRICS.map((x) => (
             <button
               key={x.key}

@@ -4,13 +4,14 @@ export type Exercise = {
   muscle_group: string | null
   equipment: string | null
   user_id: string | null
+  kind?: string | null
 }
 
 export type SetType = 'normal' | 'warmup' | 'drop' | 'failure'
 
-export type DraftSet = { weight: string; reps: string; done: boolean; type: SetType }
+export type DraftSet = { weight: string; reps: string; done: boolean; type: SetType; distance?: string; duration?: string }
 
-export type PrevSet = { weight: number; reps: number }
+export type PrevSet = { weight: number; reps: number; distance?: number | null; duration?: number | null }
 
 export type DraftExercise = {
   exerciseId: string
@@ -18,6 +19,7 @@ export type DraftExercise = {
   rest: number
   sets: DraftSet[]
   prev: PrevSet[]
+  kind?: string | null
 }
 
 export type DraftWorkout = {
@@ -37,6 +39,6 @@ export type RoutineWithExercises = {
     target_reps: string | null
     rest_seconds: number
     exercise_id: string
-    exercises: { name: string } | null
+    exercises: { name: string; kind?: string | null } | null
   }[]
 }

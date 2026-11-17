@@ -4,16 +4,16 @@ import { createClient } from '@/lib/supabase/server'
 import DeleteButton from '@/components/DeleteButton'
 import BackLink from '@/components/BackLink'
 import Icon from '@/components/Icon'
-import { epley, fmtDate, fmtDuration, fmtNum } from '@/lib/format'
+import { epley, fmtCardio, fmtDate, fmtDuration, fmtNum } from '@/lib/format'
 
-type SetRow = { position: number; set_index: number; weight: number; reps: number; set_type: string; exercise_id: string; exercises: { name: string } | null }
+type SetRow = { position: number; set_index: number; weight: number; reps: number; set_type: string; exercise_id: string; distance_m: number | null; duration_s: number | null; exercises: { name: string; kind?: string | null } | null }
 
 export default async function WorkoutDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
   const { data: w } = await supabase
     .from('workouts')
-    .select('id,name,started_at,ended_at,workout_sets(position,set_index,weight,reps,set_type,exercise_id,exercises(name))')
+    .select('id,name,started_at,ended_at,workout_sets(position,set_index,weight,reps,set_type,exercise_id,distance_m,duration_s,exercises(name,kind))')
     .eq('id', id)
     .single()
   if (!w) notFound()
@@ -80,13 +80,14 @@ export default async function WorkoutDetail({ params }: { params: Promise<{ id: 
               {g.sets.map((s, i) => {
                 if (s.set_type === 'normal') n++
                 const e = epley(Number(s.weight), s.reps)
-                const isPR = prev ? (Number(s.weight) > prev.w || e > prev.e1rm) && s.set_type !== 'warmup' : false
+                const cardio = s.exercises?.kind === 'cardio'
+                const isPR = !cardio && prev ? (Number(s.weight) > prev.w || e > prev.e1rm) && s.set_type !== 'warmup' : false
                 return (
                   <div key={i} className="flex items-center gap-3 py-2.5">
                     <span className={`num w-6 text-lg ${s.set_type === 'warmup' ? 'text-plate-yellow' : 'text-steel'}`}>
                       {s.set_type === 'normal' ? n : s.set_type[0].toUpperCase()}
                     </span>
-                    <span className="num flex-1 text-lg">{fmtNum(Number(s.weight))} kg × {s.reps}</span>
+                    <span className="num flex-1 text-lg">{cardio ? fmtCardio(s.distance_m, s.duration_s) : `${fmtNum(Number(s.weight))} kg × ${s.reps}`}</span>
                     {isPR && (
                       <span className="tag inline-flex items-center gap-1 bg-plate-yellow/20 text-[#8A6700]">
                         <Icon name="trophy" size={13} />Rekor

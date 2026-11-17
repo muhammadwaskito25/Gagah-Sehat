@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import Icon from './Icon'
 import type { Exercise } from '@/lib/types'
 
-const GROUPS = ['Dada', 'Punggung', 'Kaki', 'Bahu', 'Lengan', 'Core', 'Lainnya']
+const GROUPS = ['Dada', 'Punggung', 'Kaki', 'Bahu', 'Lengan', 'Core', 'Cardio', 'Lainnya']
 
 export default function ExercisePicker({
   open,
@@ -28,7 +28,7 @@ export default function ExercisePicker({
     if (!open) return
     supabase
       .from('exercises')
-      .select('id,name,muscle_group,equipment,user_id')
+      .select('id,name,muscle_group,equipment,user_id,kind')
       .order('name')
       .then(({ data }) => setList(data ?? []))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,8 +45,8 @@ export default function ExercisePicker({
     if (!newName.trim()) return
     const { data, error } = await supabase
       .from('exercises')
-      .insert({ name: newName.trim(), muscle_group: newGroup, equipment: newEquip || null })
-      .select('id,name,muscle_group,equipment,user_id')
+      .insert({ name: newName.trim(), muscle_group: newGroup, equipment: newEquip || null, kind: newGroup === 'Cardio' ? 'cardio' : 'strength' })
+      .select('id,name,muscle_group,equipment,user_id,kind')
       .single()
     if (error || !data) return alert(error?.message)
     setCreating(false)
@@ -109,6 +109,7 @@ export default function ExercisePicker({
                     <span className="block truncate font-semibold">{ex.name}</span>
                     <span className="block text-sm text-steel">{[ex.muscle_group, ex.equipment].filter(Boolean).join(', ')}</span>
                   </span>
+                  {ex.kind === 'cardio' && <span className="tag bg-plate-red/10 text-plate-red">Cardio</span>}
                   <Icon name="plus" size={18} className="text-plate-blue" />
                 </button>
               </li>
