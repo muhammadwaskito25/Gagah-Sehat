@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="id" className={`${body.variable} ${display.variable}`}>
       <body className="min-h-dvh font-sans antialiased">
-        <main className="mx-auto max-w-md px-5 pb-32 pt-[max(env(safe-area-inset-top),1.25rem)]">
+        <main className="mx-auto max-w-md px-5 pb-28 pt-[calc(env(safe-area-inset-top)+2.5rem)]">
           {children}
         </main>
         <BottomNav />

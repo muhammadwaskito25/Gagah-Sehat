@@ -186,7 +186,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
   return (
     <div className="space-y-4 pb-10">
       {/* Header lengket */}
-      <div className="sticky top-0 z-20 -mx-5 border-b border-line bg-chalk/95 px-5 pb-3 pt-[max(env(safe-area-inset-top),0.75rem)] backdrop-blur">
+      <div className="sticky top-0 z-20 -mx-5 border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
         <div className="flex items-center justify-between">
           <button onClick={discard} className="btn-soft btn-sm -ml-1 text-plate-red">Buang</button>
           <span className="num text-xl tabular-nums">{fmtClock(elapsed)}</span>

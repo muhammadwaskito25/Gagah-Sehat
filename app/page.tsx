@@ -47,7 +47,7 @@ export default async function Home() {
     <div className="space-y-8">
       <header className="flex items-end justify-between pt-2">
         <h1 className="title">Minggu ini</h1>
-        <Link href="/history" className="text-sm font-semibold text-plate-blue">Riwayat</Link>
+        <Link href="/profile" aria-label="Profile" className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-ink"><Icon name="user" size={20} /></Link>
       </header>
 
       {/* Barbel mingguan: tiap sesi = satu piringan */}
@@ -68,13 +68,13 @@ export default async function Home() {
         <div className="mt-4 grid grid-cols-3 divide-x divide-line border-t border-line pt-4">
           <Stat value={String(wCount)} unit="sesi" label="Gym" dot="bg-plate-blue" />
           <Stat value={fmtNum(wVol / 1000)} unit="ton" label="Volume" />
-          <Stat value={rKm.toFixed(1)} unit="km" label="Lari" dot="bg-plate-red" />
+          <Link href="/runs" className="block"><Stat value={rKm.toFixed(1)} unit="km" label="Lari" dot="bg-plate-red" chevron /></Link>
         </div>
       </section>
 
       <section className="grid grid-cols-2 gap-3">
         <Link href="/workout" className="btn-primary h-14"><Icon name="plus" size={18} strokeWidth={2.5} />Latihan baru</Link>
-        <Link href="/routines" className="btn-ghost h-14"><Icon name="list" size={18} />Pilih routine</Link>
+        <Link href="/runs" className="btn-ghost h-14"><Icon name="run" size={18} />Lari</Link>
       </section>
 
 
@@ -104,12 +104,13 @@ export default async function Home() {
   )
 }
 
-function Stat({ value, unit, label, dot }: { value: string; unit: string; label: string; dot?: string }) {
+function Stat({ value, unit, label, dot, chevron }: { value: string; unit: string; label: string; dot?: string; chevron?: boolean }) {
   return (
     <div className="px-3 first:pl-1">
       <div className="flex items-center gap-1.5 text-[13px] text-steel">
         {dot && <span className={`h-2 w-2 rounded-full ${dot}`} />}
         {label}
+        {chevron && <Icon name="right" size={14} className="ml-auto" />}
       </div>
       <div className="mt-1 flex items-baseline gap-1">
         <span className="num text-[30px] leading-none">{value}</span>

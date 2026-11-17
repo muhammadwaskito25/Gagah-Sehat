@@ -12,7 +12,7 @@ export default async function RoutinesPage() {
   return (
     <div className="space-y-6">
       <header className="flex items-end justify-between pt-2">
-        <h1 className="title">Routine</h1>
+        <h1 className="title">Workout</h1>
         <Link href="/routines/new" className="btn-dark btn-sm"><Icon name="plus" size={16} strokeWidth={2.5} />Baru</Link>
       </header>
 
