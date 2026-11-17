@@ -1,11 +1,9 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const supabase = createClient()
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mode, setMode] = useState<'in' | 'up'>('in')
@@ -16,15 +14,27 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setMsg('')
-    const { error } =
+    const { data, error } =
       mode === 'in'
         ? await supabase.auth.signInWithPassword({ email, password })
         : await supabase.auth.signUp({ email, password })
-    setLoading(false)
-    if (error) return setMsg(error.message)
-    if (mode === 'up') setMsg('Akun dibuat. Kalau konfirmasi email aktif, cek inbox dulu')
-    router.replace('/')
-    router.refresh()
+    if (error) {
+      setLoading(false)
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        return setMsg('Email belum dikonfirmasi. Klik link di email dari Supabase, atau matikan "Confirm email" di Supabase Dashboard')
+      }
+      if (error.message.toLowerCase().includes('invalid login')) return setMsg('Email atau password salah')
+      return setMsg(error.message)
+    }
+    if (!data.session) {
+      setLoading(false)
+      setMode('in')
+      return setMsg('Akun dibuat, tapi perlu konfirmasi email dulu. Cek inbox/spam, lalu Masuk')
+    }
+    // Tunggu sebentar agar cookie sesi ter-set oleh browser sebelum redirect
+    setMsg('Berhasil, membuka app...')
+    await new Promise((r) => setTimeout(r, 300))
+    window.location.replace('/')
   }
 
   return (

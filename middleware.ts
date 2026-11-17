@@ -21,9 +21,19 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Refresh session supaya cookie tidak expired — WAJIB sebelum getUser
+  await supabase.auth.getSession()
   const { data: { user } } = await supabase.auth.getUser()
+
   const path = request.nextUrl.pathname
   const isPublic = path.startsWith('/login') || path.startsWith('/auth')
+
+  // Sudah login tapi buka /login, arahkan ke beranda
+  if (user && path.startsWith('/login')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.redirect(url)
+  }
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()
