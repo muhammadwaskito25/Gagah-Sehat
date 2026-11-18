@@ -121,7 +121,11 @@ export default function RunRoutineEditor({ initial }: { initial: RunRoutine | nu
           <button
             key={t.key}
             onClick={() => pickType(t.key)}
-            className={`chip ${type === t.key ? 'bg-plate-red text-white' : 'bg-white text-ink ring-1 ring-line'}`}
+            className={`chip transition ${
+              type === t.key
+                ? 'border-[#00B4D8] bg-[#00B4D8] text-white font-bold shadow-sm'
+                : 'border-[#202637] bg-[#11141B] text-slate-400 hover:text-white'
+            }`}
           >
             {t.label}
           </button>

@@ -26,23 +26,28 @@ export default async function ProfilePage() {
       <header className="space-y-3">
         <BackLink href="/" label="Home" />
         <div className="flex items-center gap-4">
-          <span className="num flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-plate-blue text-3xl text-white">{initial}</span>
+          <span className="num flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF5500] to-[#CC3700] text-3xl font-black text-white shadow-lg shadow-orange-500/25">
+            {initial}
+          </span>
           <div className="min-w-0">
-            <h1 className="truncate font-display text-[26px] font-semibold leading-tight">{user?.email}</h1>
-            {since && <p className="muted">Bergabung {since}</p>}
+            <h1 className="truncate font-display text-[26px] font-bold uppercase text-white">{user?.email}</h1>
+            {since && <p className="muted">Bergabung sejak {since}</p>}
           </div>
         </div>
       </header>
 
-      <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+      <div className="grid grid-cols-3 divide-x divide-[#202637] rounded-[20px] border border-[#202637] bg-[#11141B] py-3.5 shadow-plate">
         {[
           ['Latihan', String(workoutCount ?? 0), 'sesi'],
           ['Volume', fmtNum(volume / 1000), 'ton'],
           ['Lari', km.toFixed(0), 'km'],
         ].map(([l, v, u]) => (
           <div key={l} className="px-4">
-            <div className="text-[13px] text-steel">{l}</div>
-            <div className="mt-0.5 flex items-baseline gap-1"><span className="num text-2xl leading-none">{v}</span><span className="text-sm text-steel">{u}</span></div>
+            <div className="text-[12px] font-bold uppercase tracking-wider text-slate-400">{l}</div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="num text-2xl font-black text-white">{v}</span>
+              <span className="text-xs font-semibold text-slate-400">{u}</span>
+            </div>
           </div>
         ))}
       </div>

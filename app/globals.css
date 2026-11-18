@@ -2,31 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body { background: #F2F3EF; color: #15181D; -webkit-tap-highlight-color: transparent; }
+html, body {
+  background: #08090C;
+  color: #F8FAFC;
+  -webkit-tap-highlight-color: transparent;
+}
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-*:focus-visible { outline: 2px solid #1D4ED8; outline-offset: 2px; border-radius: 8px; }
+*:focus-visible { outline: 2px solid #FF5500; outline-offset: 2px; border-radius: 8px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
 @layer components {
-  .title { @apply font-display text-[34px] font-semibold leading-none tracking-tight; }
-  .section { @apply font-display text-[22px] font-semibold leading-tight; }
-  .muted { @apply text-sm text-steel; }
-  .num { @apply font-display font-semibold tabular-nums; }
+  .title { @apply font-display text-[32px] sm:text-[36px] font-bold tracking-tight text-white uppercase; }
+  .section { @apply font-display text-[19px] sm:text-[21px] font-bold tracking-wide text-slate-100 uppercase; }
+  .muted { @apply text-xs sm:text-sm text-slate-400; }
+  .num { @apply font-display font-bold tabular-nums tracking-tight; }
 
-  .card { @apply rounded-[18px] border border-line bg-white p-4; }
-  .list { @apply divide-y divide-line overflow-hidden rounded-[18px] border border-line bg-white; }
-  .row { @apply flex items-center gap-3 px-4 py-3.5; }
+  .card { @apply rounded-[20px] border border-line bg-[#11141B] p-4 shadow-plate; }
+  .list { @apply divide-y divide-line overflow-hidden rounded-[20px] border border-line bg-[#11141B] shadow-plate; }
+  .row { @apply flex items-center gap-3 px-4 py-3.5 transition hover:bg-[#171B26]/60 active:bg-[#171B26]; }
 
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-[15px] font-semibold transition active:scale-[0.98] disabled:opacity-50; }
-  .btn-primary { @apply btn bg-plate-blue text-white; }
-  .btn-dark { @apply btn bg-ink text-white; }
-  .btn-ghost { @apply btn border border-line bg-white text-ink; }
-  .btn-soft { @apply btn bg-chalk text-ink; }
-  .btn-sm { @apply px-3 py-2 text-sm; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-[14px] sm:text-[15px] font-bold tracking-wide transition active:scale-[0.98] disabled:opacity-50 select-none; }
+  .btn-primary { @apply btn bg-[#FF5500] hover:bg-[#FF6611] text-white shadow-lg shadow-orange-500/25 active:shadow-none; }
+  .btn-dark { @apply btn bg-[#171B26] hover:bg-[#202637] text-white border border-[#2D364D]; }
+  .btn-ghost { @apply btn border border-line bg-[#11141B] text-slate-200 hover:bg-[#171B26] hover:border-slate-600; }
+  .btn-soft { @apply btn bg-[#171B26] text-slate-200 hover:bg-[#202637]; }
+  .btn-sm { @apply px-3 py-2 text-xs font-semibold; }
 
-  .input { @apply w-full rounded-xl border border-line bg-white px-3.5 py-3 text-[15px] text-ink outline-none placeholder:text-steel/70 focus:border-plate-blue; }
-  .field { @apply block text-[13px] font-medium text-steel; }
+  .input { @apply w-full rounded-xl border border-line bg-[#171B26] px-3.5 py-3 text-[15px] text-white outline-none placeholder:text-slate-500 focus:border-[#FF5500] focus:ring-1 focus:ring-[#FF5500]; }
+  .field { @apply block text-[12px] font-bold tracking-wider uppercase text-slate-400; }
 
-  .chip { @apply rounded-full px-3 py-1.5 text-[13px] font-medium; }
-  .tag { @apply rounded-md px-2 py-0.5 text-xs font-semibold; }
+  .chip { @apply rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide border border-line; }
+  .tag { @apply rounded-md px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider; }
 }

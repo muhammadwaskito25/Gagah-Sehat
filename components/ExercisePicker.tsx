@@ -57,14 +57,14 @@ export default function ExercisePicker({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-chalk">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#08090C]">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden">
-        <div className="space-y-3 border-b border-line px-5 pb-3 pt-[max(env(safe-area-inset-top),1rem)]">
+        <div className="space-y-3 border-b border-[#202637] px-5 pb-3 pt-[max(env(safe-area-inset-top),1rem)]">
           <div className="flex items-center justify-between">
-            <button onClick={onClose} className="btn-soft btn-sm -ml-1 bg-transparent">Batal</button>
-            <h2 className="font-display text-xl font-semibold">Pilih latihan</h2>
-            <button onClick={() => setCreating(!creating)} className="btn-soft btn-sm -mr-1 bg-transparent text-plate-blue">
-              {creating ? 'Tutup' : 'Buat baru'}
+            <button onClick={onClose} className="btn-soft btn-sm -ml-1 bg-transparent text-slate-400">Batal</button>
+            <h2 className="font-display text-xl font-bold uppercase tracking-wide text-white">Pilih latihan</h2>
+            <button onClick={() => setCreating(!creating)} className="btn-soft btn-sm -mr-1 bg-transparent font-bold text-[#FF5500]">
+              {creating ? 'Tutup' : '+ Buat baru'}
             </button>
           </div>
 
@@ -82,15 +82,19 @@ export default function ExercisePicker({
           ) : (
             <>
               <label className="relative block">
-                <Icon name="search" size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-steel" />
-                <input className="input pl-10" placeholder="Cari latihan" value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
+                <Icon name="search" size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input className="input pl-10" placeholder="Cari latihan..." value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
               </label>
               <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none]">
                 {[null, ...GROUPS].map((g) => (
                   <button
                     key={g ?? 'all'}
                     onClick={() => setGroup(g)}
-                    className={`chip shrink-0 ${group === g ? 'bg-ink text-white' : 'bg-white text-ink ring-1 ring-line'}`}
+                    className={`chip shrink-0 transition ${
+                      group === g
+                        ? 'border-[#FF5500] bg-[#FF5500] text-white shadow-sm'
+                        : 'border-[#202637] bg-[#11141B] text-slate-400 hover:text-white'
+                    }`}
                   >
                     {g ?? 'Semua'}
                   </button>
@@ -101,16 +105,16 @@ export default function ExercisePicker({
         </div>
 
         {!creating && (
-          <ul className="flex-1 overflow-y-auto px-5 pb-10 pt-2">
+          <ul className="flex-1 overflow-y-auto px-5 pb-10 pt-2 divide-y divide-[#202637]">
             {filtered.map((ex) => (
               <li key={ex.id}>
-                <button className="flex w-full items-center gap-3 border-b border-line py-3.5 text-left" onClick={() => onPick(ex)}>
+                <button className="flex w-full items-center gap-3 py-3.5 text-left transition hover:text-[#FF5500]" onClick={() => onPick(ex)}>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-semibold">{ex.name}</span>
-                    <span className="block text-sm text-steel">{[ex.muscle_group, ex.equipment].filter(Boolean).join(', ')}</span>
+                    <span className="block truncate font-display text-[17px] font-bold text-white">{ex.name}</span>
+                    <span className="block text-xs font-medium text-slate-400">{[ex.muscle_group, ex.equipment].filter(Boolean).join(' · ')}</span>
                   </span>
-                  {ex.kind === 'cardio' && <span className="tag bg-plate-red/10 text-plate-red">Cardio</span>}
-                  <Icon name="plus" size={18} className="text-plate-blue" />
+                  {ex.kind === 'cardio' && <span className="tag border border-cyan-500/20 bg-cyan-500/10 text-[#00B4D8]">Cardio</span>}
+                  <Icon name="plus" size={18} className="text-[#FF5500]" />
                 </button>
               </li>
             ))}

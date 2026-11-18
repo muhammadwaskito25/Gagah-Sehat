@@ -214,11 +214,11 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
 
       <input
         aria-label="Nama latihan"
-        className="w-full bg-transparent font-display text-[32px] font-semibold leading-tight tracking-tight outline-none"
+        className="w-full bg-transparent font-display text-[32px] sm:text-[36px] font-black uppercase leading-tight tracking-tight text-white outline-none placeholder:text-slate-600"
         value={draft.name}
         onChange={(e) => update((d) => { d.name = e.target.value })}
       />
-      <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+      <div className="grid grid-cols-3 divide-x divide-[#202637] rounded-[20px] border border-[#202637] bg-[#11141B] py-3.5 shadow-plate">
         <Mini label="Volume" value={`${fmtNum(volume)}`} unit="kg" />
         <Mini label="Set selesai" value={String(doneSets.length)} />
         <Mini label="Latihan" value={String(draft.exercises.length)} />
@@ -282,7 +282,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
                 <div className="num text-[30px] leading-none">{fmtClock(restLeft)}</div>
               </div>
               <button className="h-11 w-14 rounded-xl bg-white/10 text-sm font-semibold" onClick={() => setRest({ end: rest.end + 15000, total: rest.total + 15 })}>+15</button>
-              <button className="h-11 rounded-xl bg-white px-4 text-sm font-semibold text-ink" onClick={() => setRest(null)}>Lewati</button>
+              <button className="h-11 rounded-xl bg-[#FF5500] px-4 text-sm font-bold text-white shadow-md active:scale-95 transition" onClick={() => setRest(null)}>Lewati</button>
             </div>
           </div>
         </div>
@@ -296,10 +296,10 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
 function Mini({ label, value, unit }: { label: string; value: string; unit?: string }) {
   return (
     <div className="px-4">
-      <div className="text-[13px] text-steel">{label}</div>
-      <div className="mt-0.5 flex items-baseline gap-1">
-        <span className="num text-2xl leading-none">{value}</span>
-        {unit && <span className="text-sm text-steel">{unit}</span>}
+      <div className="text-[12px] font-bold uppercase tracking-wider text-slate-400">{label}</div>
+      <div className="mt-1 flex items-baseline gap-1">
+        <span className="num text-2xl font-black text-white">{value}</span>
+        {unit && <span className="text-xs font-semibold text-slate-400">{unit}</span>}
       </div>
     </div>
   )
@@ -325,10 +325,10 @@ function ExerciseBlock({
   let normalNo = 0
 
   return (
-    <section className="rounded-[18px] border border-line bg-white">
+    <section className="rounded-[20px] border border-[#202637] bg-[#11141B] shadow-plate">
       <div className="flex items-center justify-between gap-2 px-4 pb-2 pt-4">
-        <h3 className="min-w-0 truncate font-display text-[22px] font-semibold leading-tight">{ex.name}</h3>
-        <button aria-label="Opsi latihan" className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-steel active:bg-chalk" onClick={() => setMenu(!menu)}>
+        <h3 className="min-w-0 truncate font-display text-[22px] font-bold uppercase tracking-wide text-white">{ex.name}</h3>
+        <button aria-label="Opsi latihan" className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-slate-400 active:bg-[#171B26]" onClick={() => setMenu(!menu)}>
           <Icon name="more" size={20} />
         </button>
       </div>
@@ -337,16 +337,16 @@ function ExerciseBlock({
         <div className="mx-4 mb-3 grid grid-cols-3 gap-2">
           <button className="btn-soft btn-sm" onClick={() => onMove(-1)}><Icon name="up" size={16} />Naik</button>
           <button className="btn-soft btn-sm" onClick={() => onMove(1)}><Icon name="down" size={16} />Turun</button>
-          <button className="btn-soft btn-sm text-plate-red" onClick={onRemove}><Icon name="trash" size={16} />Hapus</button>
+          <button className="btn-soft btn-sm text-[#EF4444]" onClick={onRemove}><Icon name="trash" size={16} />Hapus</button>
         </div>
       )}
 
 {!cardio && (
-      <label className="mx-4 mb-3 inline-flex items-center gap-2 rounded-full bg-chalk py-1 pl-3 pr-1 text-[13px] text-steel">
+      <label className="mx-4 mb-3 inline-flex items-center gap-2 rounded-full border border-[#202637] bg-[#0A0C11] py-1 pl-3 pr-1 text-[12px] font-semibold text-slate-400">
         <Icon name="timer" size={15} />
         Istirahat
         <select
-          className="rounded-full bg-white px-2 py-1 font-semibold text-ink outline-none"
+          className="rounded-full border border-[#202637] bg-[#171B26] px-2.5 py-1 font-bold text-white outline-none"
           value={ex.rest}
           onChange={(e) => onRest(Number(e.target.value))}
         >
@@ -373,20 +373,20 @@ function ExerciseBlock({
           const labelCls =
             s.type === 'warmup' ? 'text-plate-yellow' : s.type === 'drop' ? 'text-plate-blue' : s.type === 'failure' ? 'text-plate-red' : 'text-ink'
           return (
-            <div key={si} className={`${GRID} rounded-xl px-1.5 py-1.5 transition-colors ${s.done ? 'bg-plate-green/10' : ''}`}>
+            <div key={si} className={`${GRID} rounded-xl px-1.5 py-1.5 transition-colors ${s.done ? 'bg-[#10B981]/10' : ''}`}>
               <button
                 aria-label="Ganti tipe set"
-                className={`num h-9 rounded-lg text-lg ${labelCls}`}
+                className={`num h-9 rounded-lg text-lg font-black ${labelCls}`}
                 onClick={() => !cardio && onCycleType(si)}
                 onDoubleClick={() => onRemoveSet(si)}
               >
                 {label}
               </button>
-              <div className="truncate text-sm text-steel">{p ? (cardio ? fmtCardio(p.distance, p.duration) : `${fmtNum(p.weight)} × ${p.reps}`) : '—'}</div>
+              <div className="truncate text-sm font-semibold text-slate-400">{p ? (cardio ? fmtCardio(p.distance, p.duration) : `${fmtNum(p.weight)} × ${p.reps}`) : '—'}</div>
               <input
                 inputMode="decimal"
                 aria-label={cardio ? 'Jarak km' : 'Beban kg'}
-                className={`num h-10 w-full rounded-lg text-center text-lg outline-none ${s.done ? 'bg-transparent' : 'bg-chalk'} placeholder:text-steel/50`}
+                className={`num h-10 w-full rounded-lg text-center text-lg font-bold outline-none transition ${s.done ? 'bg-transparent text-white' : 'bg-[#171B26] border border-[#202637] text-white focus:border-[#FF5500]'} placeholder:text-slate-600`}
                 placeholder={cardio ? (p?.distance ? String(Math.round((p.distance / 1000) * 100) / 100) : '0') : p ? String(p.weight) : '0'}
                 value={cardio ? s.distance ?? '' : s.weight}
                 onChange={(e) => onChangeSet(si, cardio ? { distance: e.target.value.replace(',', '.') } : { weight: e.target.value.replace(',', '.') })}
@@ -394,7 +394,7 @@ function ExerciseBlock({
               <input
                 inputMode={cardio ? 'decimal' : 'numeric'}
                 aria-label={cardio ? 'Durasi menit' : 'Repetisi'}
-                className={`num h-10 w-full rounded-lg text-center text-lg outline-none ${s.done ? 'bg-transparent' : 'bg-chalk'} placeholder:text-steel/50`}
+                className={`num h-10 w-full rounded-lg text-center text-lg font-bold outline-none transition ${s.done ? 'bg-transparent text-white' : 'bg-[#171B26] border border-[#202637] text-white focus:border-[#FF5500]'} placeholder:text-slate-600`}
                 placeholder={cardio ? (p?.duration ? String(Math.round((p.duration / 60) * 10) / 10) : '0') : p ? String(p.reps) : '0'}
                 value={cardio ? s.duration ?? '' : s.reps}
                 onChange={(e) => onChangeSet(si, cardio ? { duration: e.target.value.replace(',', '.') } : { reps: e.target.value })}
@@ -402,7 +402,9 @@ function ExerciseBlock({
               <button
                 aria-label={s.done ? 'Batalkan set' : 'Selesaikan set'}
                 onClick={() => onToggle(si)}
-                className={`flex h-10 w-10 items-center justify-center justify-self-center rounded-xl transition ${s.done ? 'bg-plate-green text-white' : 'border border-line text-steel'}`}
+                className={`flex h-10 w-10 items-center justify-center justify-self-center rounded-xl transition ${
+                  s.done ? 'bg-[#10B981] text-white shadow-md shadow-emerald-500/30' : 'border border-[#202637] bg-[#171B26] text-slate-500 hover:text-white hover:border-slate-500'
+                }`}
               >
                 <Icon name="check" size={18} strokeWidth={2.6} />
               </button>

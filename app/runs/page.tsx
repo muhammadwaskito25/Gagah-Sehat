@@ -55,22 +55,29 @@ export default async function RunsPage({ searchParams }: { searchParams: Promise
       {strava === 'connected' && <p className="card border-plate-green/40 text-sm">Strava tersambung. Tekan Sinkronkan untuk menarik data lari</p>}
       {strava === 'error' && <p className="card border-plate-red/40 text-sm">Gagal menyambungkan Strava. Coba lagi</p>}
 
-      <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+      <div className="grid grid-cols-3 divide-x divide-[#202637] rounded-[20px] border border-[#202637] bg-[#11141B] py-3.5 shadow-plate">
         {[
           ['Total', (total / 1000).toFixed(0), 'km'],
           ['Terjauh', (longest / 1000).toFixed(1), 'km'],
           ['Pace 5K+', isFinite(best5k) ? fmtPace(best5k, 1000).replace(' /km', '') : '-', '/km'],
         ].map(([l, v, u]) => (
           <div key={l} className="px-4">
-            <div className="text-[13px] text-steel">{l}</div>
-            <div className="mt-0.5 flex items-baseline gap-1"><span className="num text-2xl leading-none">{v}</span><span className="text-sm text-steel">{u}</span></div>
+            <div className="text-[12px] font-bold uppercase tracking-wider text-slate-400">{l}</div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="num text-2xl font-black text-white">{v}</span>
+              <span className="text-xs font-semibold text-slate-400">{u}</span>
+            </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Link href="/runs/start" className="btn h-12 bg-plate-red text-white">Mulai lari</Link>
-        <Link href="/routines" className="btn-ghost h-12">Routine lari</Link>
+        <Link href="/runs/start" className="btn h-12 bg-[#00B4D8] hover:bg-[#0096B4] text-white font-bold shadow-lg shadow-cyan-500/20 active:scale-[0.98]">
+          Mulai Lari
+        </Link>
+        <Link href="/routines" className="btn-ghost h-12 font-bold">
+          Routine Lari
+        </Link>
       </div>
 
       <StravaPanel connected={!!tok} />

@@ -10,11 +10,11 @@ const display = Barlow_Condensed({ subsets: ['latin'], weight: ['500', '600', '7
 export const metadata: Metadata = {
   title: 'Gagah',
   description: 'Catatan progres gym dan lari',
-  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Gagah' },
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Gagah' },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F2F3EF',
+  themeColor: '#08090C',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,

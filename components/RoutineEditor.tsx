@@ -120,15 +120,15 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
 
   return (
     <div className="space-y-5">
-      <div className="sticky top-0 z-20 -mx-5 -mt-[calc(env(safe-area-inset-top)+2.5rem)] flex items-center justify-between border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
-        <button className="btn-soft btn-sm -ml-1 bg-transparent" onClick={() => router.back()}>Batal</button>
-        <span className="font-display text-xl font-semibold">{initial ? 'Edit routine' : 'Routine baru'}</span>
-        <button className="btn-dark btn-sm" onClick={save} disabled={saving}>{saving ? 'Menyimpan' : 'Simpan'}</button>
+      <div className="sticky top-0 z-20 -mx-5 -mt-[calc(env(safe-area-inset-top)+2.5rem)] flex items-center justify-between border-b border-[#202637] bg-[#08090C]/95 backdrop-blur px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
+        <button className="btn-soft btn-sm -ml-1 bg-transparent text-slate-400" onClick={() => router.back()}>Batal</button>
+        <span className="font-display text-xl font-bold uppercase tracking-wide text-white">{initial ? 'Edit Routine' : 'Routine Baru'}</span>
+        <button className="btn-primary btn-sm" onClick={save} disabled={saving}>{saving ? 'Menyimpan...' : 'Simpan'}</button>
       </div>
 
       <input
-        className="w-full bg-transparent font-display text-[32px] font-semibold leading-tight tracking-tight outline-none placeholder:text-steel/50"
-        placeholder="Nama routine"
+        className="w-full bg-transparent font-display text-[32px] font-black uppercase leading-tight tracking-tight text-white outline-none placeholder:text-slate-600"
+        placeholder="NAMA ROUTINE"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />

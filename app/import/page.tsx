@@ -146,16 +146,24 @@ export default function ImportPage() {
         <h1 className="title">Impor dari Hevy</h1>
       </header>
 
-      <div className="grid grid-cols-2 gap-1 rounded-xl bg-white p-1 ring-1 ring-line">
+      <div className="grid grid-cols-2 gap-1 rounded-xl border border-[#202637] bg-[#0A0C11] p-1">
         {([['text', 'Tempel routine'], ['csv', 'File CSV']] as const).map(([k, l]) => (
-          <button key={k} onClick={() => setMode(k)} className={`rounded-lg py-2 text-sm font-semibold ${mode === k ? 'bg-ink text-white' : 'text-steel'}`}>{l}</button>
+          <button
+            key={k}
+            onClick={() => setMode(k)}
+            className={`rounded-lg py-2 text-sm font-bold tracking-wide transition ${
+              mode === k ? 'bg-[#FF5500] text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            {l}
+          </button>
         ))}
       </div>
 
       {mode === 'text' ? <PasteRoutine /> : (<>
       <section className="card space-y-2 text-[15px] leading-relaxed">
-        <p className="font-semibold">Cara ambil file dari Hevy</p>
-        <ol className="list-decimal space-y-1 pl-5 text-ink/80">
+        <p className="font-display text-lg font-bold uppercase text-white">Cara ambil file dari Hevy</p>
+        <ol className="list-decimal space-y-1 pl-5 text-slate-300 text-sm">
           <li>Buka Hevy, masuk ke Profile lalu Settings</li>
           <li>Pilih Export & Import Data, lalu Export Data</li>
           <li>Pilih Export Workouts dan simpan file CSV-nya</li>
@@ -163,9 +171,9 @@ export default function ImportPage() {
         </ol>
       </section>
 
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[18px] border-2 border-dashed border-line bg-white px-4 py-8 text-center">
-        <Icon name="up" size={24} className="text-plate-blue" />
-        <span className="font-semibold">{fileName || 'Pilih file CSV Hevy'}</span>
+      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[20px] border-2 border-dashed border-[#202637] bg-[#11141B] px-4 py-8 text-center transition hover:border-[#FF5500]/50">
+        <Icon name="up" size={24} className="text-[#FF5500]" />
+        <span className="font-bold text-white">{fileName || 'Pilih file CSV Hevy'}</span>
         <span className="muted">{fileName ? 'Ketuk untuk ganti file' : 'workouts.csv'}</span>
         <input type="file" accept=".csv,.tsv,text/csv" className="hidden" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
       </label>
@@ -174,15 +182,15 @@ export default function ImportPage() {
 
       {workouts && (
         <>
-          <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+          <div className="grid grid-cols-3 divide-x divide-[#202637] rounded-[20px] border border-[#202637] bg-[#11141B] py-3.5 shadow-plate">
             {[
               ['Latihan', workouts.length],
               ['Set', setCount],
               ['Routine', routines.length],
             ].map(([l, v]) => (
               <div key={l} className="px-4">
-                <div className="text-[13px] text-steel">{l}</div>
-                <div className="num mt-0.5 text-2xl leading-none">{v}</div>
+                <div className="text-[12px] font-bold uppercase tracking-wider text-slate-400">{l}</div>
+                <div className="num mt-1 text-2xl font-black text-white">{v}</div>
               </div>
             ))}
           </div>

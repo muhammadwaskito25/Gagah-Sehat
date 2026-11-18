@@ -39,31 +39,31 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[88dvh] flex-col justify-between pt-10">
       <div>
-        <div className="mb-10 flex h-14 w-14 items-center justify-center rounded-full bg-plate-blue">
-          <span className="h-4 w-4 rounded-full bg-chalk" />
+        <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF5500] to-[#CC3700] shadow-lg shadow-orange-500/30">
+          <span className="h-4 w-4 rounded-full bg-[#08090C]" />
         </div>
-        <h1 className="font-display text-[56px] font-bold leading-[0.9] tracking-tight">Gagah</h1>
-        <p className="mt-3 max-w-[16rem] text-[17px] leading-snug text-steel">Catat angkatan, pantau lari, lihat dirimu makin kuat tiap minggu</p>
+        <h1 className="font-display text-[56px] font-black uppercase leading-[0.9] tracking-tight text-white">Gagah</h1>
+        <p className="mt-3 max-w-[17rem] text-[16px] leading-snug text-slate-400">Catat angkatan, pantau lari, lihat dirimu makin kuat dan berotot tiap minggu</p>
       </div>
 
       <div>
         <form onSubmit={submit} className="space-y-3">
           <label className="block">
             <span className="field mb-1.5">Email</span>
-            <input className="input" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input className="input" type="email" autoComplete="email" placeholder="kamu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </label>
           <label className="block">
             <span className="field mb-1.5">Password</span>
-            <input className="input" type="password" autoComplete={mode === 'in' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+            <input className="input" type="password" autoComplete={mode === 'in' ? 'current-password' : 'new-password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
           </label>
-          {msg && <p className="rounded-xl bg-white px-3.5 py-3 text-sm text-ink ring-1 ring-line">{msg}</p>}
-          <button className="btn-dark mt-2 w-full" disabled={loading}>
-            {loading ? 'Tunggu...' : mode === 'in' ? 'Masuk' : 'Buat akun'}
+          {msg && <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-3 text-sm font-semibold text-amber-400">{msg}</p>}
+          <button className="btn-primary mt-2 w-full text-[15px]" disabled={loading}>
+            {loading ? 'Tunggu...' : mode === 'in' ? 'Masuk' : 'Buat Akun'}
           </button>
         </form>
-        <button className="mt-5 w-full text-center text-sm text-steel" onClick={() => { setMode(mode === 'in' ? 'up' : 'in'); setMsg('') }}>
+        <button className="mt-5 w-full text-center text-sm text-slate-400 hover:text-white transition" onClick={() => { setMode(mode === 'in' ? 'up' : 'in'); setMsg('') }}>
           {mode === 'in' ? 'Belum punya akun? ' : 'Sudah punya akun? '}
-          <span className="font-semibold text-ink underline underline-offset-4">{mode === 'in' ? 'Daftar' : 'Masuk'}</span>
+          <span className="font-bold text-[#FF5500] underline underline-offset-4">{mode === 'in' ? 'Daftar' : 'Masuk'}</span>
         </button>
       </div>
     </div>

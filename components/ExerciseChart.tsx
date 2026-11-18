@@ -23,22 +23,24 @@ export default function ExerciseChart({ data, metrics = STRENGTH }: { data: ExPo
   return (
     <section className="card px-0 pb-2">
       <div className="px-4">
-        <div className="grid gap-1 rounded-xl bg-chalk p-1" style={{ gridTemplateColumns: `repeat(${METRICS.length}, minmax(0, 1fr))` }}>
+        <div className="grid gap-1 rounded-xl border border-[#202637] bg-[#0A0C11] p-1" style={{ gridTemplateColumns: `repeat(${METRICS.length}, minmax(0, 1fr))` }}>
           {METRICS.map((x) => (
             <button
               key={x.key}
               onClick={() => setMetric(x.key)}
-              className={`rounded-lg py-1.5 text-[13px] font-semibold transition ${metric === x.key ? 'bg-white text-ink shadow-[0_1px_0_#E1E3DE]' : 'text-steel'}`}
+              className={`rounded-lg py-1.5 text-[12px] font-bold tracking-wide transition ${
+                metric === x.key ? 'bg-[#FF5500] text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              }`}
             >
               {x.label}
             </button>
           ))}
         </div>
         <div className="mt-4 flex items-baseline gap-2">
-          <span className="num text-[40px] leading-none">{Math.round(last * 10) / 10}</span>
-          <span className="text-steel">{m.unit}</span>
+          <span className="num text-[40px] font-black leading-none text-white">{Math.round(last * 10) / 10}</span>
+          <span className="text-sm font-bold text-slate-400">{m.unit}</span>
           {data.length > 1 && (
-            <span className={`ml-auto text-sm font-semibold ${diff >= 0 ? 'text-plate-green' : 'text-plate-red'}`}>
+            <span className={`ml-auto text-sm font-bold ${diff >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
               {diff >= 0 ? '+' : ''}{diff.toFixed(1)}%
             </span>
           )}
@@ -49,18 +51,18 @@ export default function ExerciseChart({ data, metrics = STRENGTH }: { data: ExPo
           <AreaChart data={data} margin={{ top: 10, right: 16, left: 16, bottom: 0 }}>
             <defs>
               <linearGradient id="fillBlue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#1D4ED8" stopOpacity={0.18} />
-                <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0} />
+                <stop offset="0%" stopColor="#FF5500" stopOpacity={0.25} />
+                <stop offset="100%" stopColor="#FF5500" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="#E1E3DE" vertical={false} />
-            <XAxis dataKey="date" tick={{ fill: '#6B7078', fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={16} />
+            <CartesianGrid stroke="#1F2537" vertical={false} />
+            <XAxis dataKey="date" tick={{ fill: '#64748B', fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={16} />
             <YAxis hide domain={['auto', 'auto']} />
             <Tooltip
-              contentStyle={{ background: '#fff', border: '1px solid #E1E3DE', borderRadius: 12, fontSize: 13 }}
+              contentStyle={{ background: '#11141B', border: '1px solid #202637', borderRadius: 12, fontSize: 13, color: '#fff' }}
               formatter={(v) => [`${Math.round(Number(v) * 10) / 10} ${m.unit}`, m.label]}
             />
-            <Area type="monotone" dataKey={metric} stroke="#1D4ED8" strokeWidth={2.5} fill="url(#fillBlue)" dot={{ r: 3, fill: '#1D4ED8', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+            <Area type="monotone" dataKey={metric} stroke="#FF5500" strokeWidth={2.5} fill="url(#fillBlue)" dot={{ r: 3, fill: '#FF5500', strokeWidth: 0 }} activeDot={{ r: 5 }} />
           </AreaChart>
         </ResponsiveContainer>
       </div>

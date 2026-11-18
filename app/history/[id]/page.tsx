@@ -54,15 +54,18 @@ export default async function WorkoutDetail({ params }: { params: Promise<{ id: 
         </div>
       </header>
 
-      <div className="grid grid-cols-3 divide-x divide-line rounded-[18px] border border-line bg-white py-3">
+      <div className="grid grid-cols-3 divide-x divide-[#202637] rounded-[20px] border border-[#202637] bg-[#11141B] py-3.5 shadow-plate">
         {[
           ['Durasi', fmtDuration(dur), ''],
           ['Volume', fmtNum(vol), 'kg'],
           ['Set', String(sets.length), ''],
         ].map(([l, v, u]) => (
           <div key={l} className="px-4">
-            <div className="text-[13px] text-steel">{l}</div>
-            <div className="mt-0.5 flex items-baseline gap-1"><span className="num text-2xl leading-none">{v}</span>{u && <span className="text-sm text-steel">{u}</span>}</div>
+            <div className="text-[12px] font-bold uppercase tracking-wider text-slate-400">{l}</div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="num text-2xl font-black text-white">{v}</span>
+              {u && <span className="text-xs font-semibold text-slate-400">{u}</span>}
+            </div>
           </div>
         ))}
       </div>
@@ -71,12 +74,12 @@ export default async function WorkoutDetail({ params }: { params: Promise<{ id: 
         const prev = bestBefore.get(g.exerciseId)
         let n = 0
         return (
-          <section key={gi} className="rounded-[18px] border border-line bg-white">
-            <Link href={`/exercises/${g.exerciseId}`} className="flex items-center justify-between px-4 pb-2 pt-4">
-              <span className="font-display text-[20px] font-semibold">{g.name}</span>
-              <Icon name="right" size={18} className="text-steel" />
+          <section key={gi} className="rounded-[20px] border border-[#202637] bg-[#11141B] shadow-plate">
+            <Link href={`/exercises/${g.exerciseId}`} className="flex items-center justify-between px-4 pb-2 pt-4 transition hover:text-[#FF5500]">
+              <span className="font-display text-[20px] font-bold text-white hover:text-[#FF5500]">{g.name}</span>
+              <Icon name="right" size={16} className="text-slate-500" />
             </Link>
-            <div className="divide-y divide-line px-4 pb-2">
+            <div className="divide-y divide-[#202637] px-4 pb-2">
               {g.sets.map((s, i) => {
                 if (s.set_type === 'normal') n++
                 const e = epley(Number(s.weight), s.reps)

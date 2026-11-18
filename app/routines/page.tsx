@@ -17,18 +17,22 @@ export default async function RoutinesPage() {
       </header>
 
       <div className="grid grid-cols-2 gap-3">
-        <Link href="/workout" className="card flex flex-col gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-plate-blue/10 text-plate-blue"><Icon name="dumbbell" size={20} /></span>
+        <Link href="/workout" className="card group flex flex-col gap-3 transition hover:border-[#FF5500]/50 hover:bg-[#151924]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-[#FF5500]">
+            <Icon name="dumbbell" size={20} strokeWidth={2.4} />
+          </span>
           <span>
-            <span className="block font-semibold">Gym kosong</span>
-            <span className="block text-sm text-steel">Tambah latihan sambil jalan</span>
+            <span className="block font-display text-[18px] font-bold uppercase tracking-wide text-white group-hover:text-[#FF5500] transition">Gym Kosong</span>
+            <span className="block text-xs font-medium text-slate-400">Tambah latihan langsung</span>
           </span>
         </Link>
-        <Link href="/runs/start" className="card flex flex-col gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-plate-red/10 text-plate-red"><Icon name="run" size={20} /></span>
+        <Link href="/runs/start" className="card group flex flex-col gap-3 transition hover:border-[#00B4D8]/50 hover:bg-[#151924]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/20 bg-cyan-500/10 text-[#00B4D8]">
+            <Icon name="run" size={20} strokeWidth={2.4} />
+          </span>
           <span>
-            <span className="block font-semibold">Lari bebas</span>
-            <span className="block text-sm text-steel">Stopwatch dan lap</span>
+            <span className="block font-display text-[18px] font-bold uppercase tracking-wide text-white group-hover:text-[#00B4D8] transition">Lari Bebas</span>
+            <span className="block text-xs font-medium text-slate-400">Stopwatch, lap & GPS</span>
           </span>
         </Link>
       </div>
@@ -98,7 +102,7 @@ export default async function RoutinesPage() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="truncate font-display text-[22px] font-semibold leading-tight">{r.name}</h3>
-                  <span className="tag shrink-0 bg-plate-red/10 text-plate-red">{runTypeLabel(r.run_type)}</span>
+                  <span className="tag shrink-0 border border-cyan-500/20 bg-cyan-500/10 text-[#00B4D8]">{runTypeLabel(r.run_type)}</span>
                 </div>
                 {targetText(r) && <p className="text-sm text-steel">{targetText(r)}</p>}
               </div>
@@ -108,7 +112,7 @@ export default async function RoutinesPage() {
             </div>
             {r.segments && r.segments.length > 0 && <p className="mt-3 text-sm text-ink/80">{r.segments.length} set</p>}
             {!(r.segments && r.segments.length > 0) && r.structure && <p className="mt-3 line-clamp-2 whitespace-pre-line text-sm leading-relaxed text-ink/80">{r.structure}</p>}
-            <Link href={`/runs/start?routine=${r.id}`} className="btn mt-4 w-full bg-plate-red text-white">Mulai</Link>
+            <Link href={`/runs/start?routine=${r.id}`} className="btn mt-4 w-full bg-[#00B4D8] hover:bg-[#0096B4] text-white font-bold shadow-lg shadow-cyan-500/20 active:scale-[0.98]">Mulai</Link>
           </article>
         ))}
       </section>
