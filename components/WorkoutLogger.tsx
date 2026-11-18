@@ -64,7 +64,9 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
             name: re.exercises?.name ?? 'Latihan',
             kind: re.exercises?.kind ?? 'strength',
             rest: re.rest_seconds,
-            sets: Array.from({ length: re.target_sets }, emptySet),
+            sets: re.exercises?.kind === 'cardio'
+              ? [{ ...emptySet(), distance: re.target_distance_m ? String(Number(re.target_distance_m) / 1000) : '', duration: re.target_duration_s ? String(Math.round((re.target_duration_s / 60) * 10) / 10) : '' }]
+              : Array.from({ length: re.target_sets }, emptySet),
             prev: await fetchPrev(re.exercise_id),
           }))
         )
@@ -194,7 +196,7 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
   return (
     <div className="space-y-4 pb-10">
       {/* Header lengket */}
-      <div className="sticky top-0 z-20 -mx-5 border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
+      <div className="sticky top-0 z-20 -mx-5 -mt-[calc(env(safe-area-inset-top)+2.5rem)] border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
         <div className="flex items-center justify-between">
           <button onClick={discard} className="btn-soft btn-sm -ml-1 text-plate-red">Buang</button>
           <span className="num text-xl tabular-nums">{fmtClock(elapsed)}</span>
@@ -333,6 +335,7 @@ function ExerciseBlock({
         </div>
       )}
 
+{!cardio && (
       <label className="mx-4 mb-3 inline-flex items-center gap-2 rounded-full bg-chalk py-1 pl-3 pr-1 text-[13px] text-steel">
         <Icon name="timer" size={15} />
         Istirahat
@@ -346,6 +349,7 @@ function ExerciseBlock({
           ))}
         </select>
       </label>
+      )}
 
       <div className={`${GRID} px-3 pb-1 text-[12px] font-medium text-steel`}>
         <div className="text-center">Set</div>
@@ -367,7 +371,7 @@ function ExerciseBlock({
               <button
                 aria-label="Ganti tipe set"
                 className={`num h-9 rounded-lg text-lg ${labelCls}`}
-                onClick={() => onCycleType(si)}
+                onClick={() => !cardio && onCycleType(si)}
                 onDoubleClick={() => onRemoveSet(si)}
               >
                 {label}
@@ -402,7 +406,7 @@ function ExerciseBlock({
       </div>
 
       <div className="flex gap-2 p-3 pt-2">
-        <button className="btn-soft btn-sm flex-1" onClick={onAddSet}><Icon name="plus" size={16} />Tambah set</button>
+        <button className="btn-soft btn-sm flex-1" onClick={onAddSet}><Icon name="plus" size={16} />{cardio ? 'Tambah sesi' : 'Tambah set'}</button>
         {ex.sets.length > 0 && (
           <button aria-label="Hapus set terakhir" className="btn-soft btn-sm px-4 text-steel" onClick={() => onRemoveSet(ex.sets.length - 1)}>
             <Icon name="x" size={16} />

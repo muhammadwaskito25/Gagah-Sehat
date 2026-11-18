@@ -38,6 +38,8 @@ export type RoutineWithExercises = {
     target_sets: number
     target_reps: string | null
     rest_seconds: number
+    target_distance_m?: number | null
+    target_duration_s?: number | null
     exercise_id: string
     exercises: { name: string; kind?: string | null } | null
   }[]

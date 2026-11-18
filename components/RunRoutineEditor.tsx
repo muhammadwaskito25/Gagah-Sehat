@@ -59,7 +59,7 @@ export default function RunRoutineEditor({ initial }: { initial: RunRoutine | nu
 
   return (
     <div className="space-y-5">
-      <div className="sticky top-0 z-20 -mx-5 flex items-center justify-between border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
+      <div className="sticky top-0 z-20 -mx-5 -mt-[calc(env(safe-area-inset-top)+2.5rem)] flex items-center justify-between border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
         <button className="btn-soft btn-sm -ml-1 bg-transparent" onClick={() => router.back()}>Batal</button>
         <span className="font-display text-xl font-semibold">{initial ? 'Edit routine lari' : 'Routine lari'}</span>
         <button className="btn-dark btn-sm" onClick={save} disabled={saving}>{saving ? 'Menyimpan' : 'Simpan'}</button>

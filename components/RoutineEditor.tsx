@@ -6,7 +6,7 @@ import ExercisePicker from './ExercisePicker'
 import Icon from './Icon'
 import type { Exercise, RoutineWithExercises } from '@/lib/types'
 
-type Item = { exerciseId: string; name: string; sets: number; reps: string; rest: number; kind?: string | null }
+type Item = { exerciseId: string; name: string; sets: number; reps: string; rest: number; kind?: string | null; km?: string; min?: string }
 
 export default function RoutineEditor({ initial }: { initial: RoutineWithExercises | null }) {
   const supabase = createClient()
@@ -22,6 +22,8 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
         sets: re.target_sets,
         reps: re.target_reps ?? '',
         rest: re.rest_seconds,
+        km: re.target_distance_m ? String(Number(re.target_distance_m) / 1000) : '',
+        min: re.target_duration_s ? String(Math.round((re.target_duration_s / 60) * 10) / 10) : '',
       }))
   )
   const [picker, setPicker] = useState(false)
@@ -60,9 +62,11 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
           routine_id: id,
           exercise_id: it.exerciseId,
           position,
-          target_sets: it.sets,
-          target_reps: it.reps,
-          rest_seconds: it.rest,
+          target_reps: it.kind === 'cardio' ? null : it.reps,
+          rest_seconds: it.kind === 'cardio' ? 0 : it.rest,
+          target_sets: it.kind === 'cardio' ? 1 : it.sets,
+          target_distance_m: it.kind === 'cardio' && it.km ? Number(it.km.replace(',', '.')) * 1000 : null,
+          target_duration_s: it.kind === 'cardio' && it.min ? Math.round(Number(it.min.replace(',', '.')) * 60) : null,
         }))
       )
       if (error) {
@@ -84,7 +88,7 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
 
   return (
     <div className="space-y-5">
-      <div className="sticky top-0 z-20 -mx-5 flex items-center justify-between border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
+      <div className="sticky top-0 z-20 -mx-5 -mt-[calc(env(safe-area-inset-top)+2.5rem)] flex items-center justify-between border-b border-line bg-chalk px-5 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
         <button className="btn-soft btn-sm -ml-1 bg-transparent" onClick={() => router.back()}>Batal</button>
         <span className="font-display text-xl font-semibold">{initial ? 'Edit routine' : 'Routine baru'}</span>
         <button className="btn-dark btn-sm" onClick={save} disabled={saving}>{saving ? 'Menyimpan' : 'Simpan'}</button>
@@ -114,13 +118,25 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
               <button aria-label="Hapus" className="flex h-9 w-9 items-center justify-center rounded-full text-plate-red active:bg-chalk" onClick={() => setItems(items.filter((_, j) => j !== i))}><Icon name="trash" size={18} /></button>
             </div>
           </div>
+          {it.kind === 'cardio' ? (
+            <div className="grid grid-cols-2 gap-2">
+              <label>
+                <span className="field mb-1">Jarak (km)</span>
+                <input className="input num py-2.5 text-center text-lg" inputMode="decimal" placeholder="opsional" value={it.km ?? ''} onChange={(e) => patch(i, { km: e.target.value })} />
+              </label>
+              <label>
+                <span className="field mb-1">Durasi (menit)</span>
+                <input className="input num py-2.5 text-center text-lg" inputMode="decimal" placeholder="opsional" value={it.min ?? ''} onChange={(e) => patch(i, { min: e.target.value })} />
+              </label>
+            </div>
+          ) : (
           <div className="grid grid-cols-3 gap-2">
             <label>
               <span className="field mb-1">Set</span>
               <input className="input num py-2.5 text-center text-lg" inputMode="numeric" value={it.sets} onChange={(e) => patch(i, { sets: Number(e.target.value) || 0 })} />
             </label>
             <label>
-              <span className="field mb-1">{it.kind === 'cardio' ? 'Target' : 'Target reps'}</span>
+              <span className="field mb-1">Target reps</span>
               <input className="input num py-2.5 text-center text-lg" value={it.reps} onChange={(e) => patch(i, { reps: e.target.value })} />
             </label>
             <label>
@@ -128,6 +144,7 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
               <input className="input num py-2.5 text-center text-lg" inputMode="numeric" value={it.rest} onChange={(e) => patch(i, { rest: Number(e.target.value) || 0 })} />
             </label>
           </div>
+          )}
         </section>
       ))}
 
@@ -140,7 +157,7 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
         onPick={(ex: Exercise) => {
           setPicker(false)
           setItems([...items, ex.kind === 'cardio'
-            ? { exerciseId: ex.id, name: ex.name, sets: 1, reps: '15 mnt', rest: 0, kind: 'cardio' }
+            ? { exerciseId: ex.id, name: ex.name, sets: 1, reps: '', rest: 0, kind: 'cardio', km: '', min: '15' }
             : { exerciseId: ex.id, name: ex.name, sets: 3, reps: '8-12', rest: 90, kind: 'strength' }])
         }}
       />
