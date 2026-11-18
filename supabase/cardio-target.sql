@@ -4,3 +4,6 @@ alter table routine_exercises add column if not exists target_duration_s int;
 
 -- "Lari Outdoor" jadi "Lari"
 update exercises set name = 'Lari' where user_id is null and name = 'Lari Outdoor';
+
+-- Set per cardio (interval): tiap set punya jarak dan durasi sendiri
+alter table routine_exercises add column if not exists cardio_sets jsonb;

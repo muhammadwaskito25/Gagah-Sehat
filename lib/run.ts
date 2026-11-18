@@ -9,6 +9,24 @@ export const RUN_TYPES = [
 
 export const runTypeLabel = (k?: string | null) => RUN_TYPES.find((t) => t.key === k)?.label ?? 'Lari'
 
+export const SEGMENT_KINDS = [
+  { key: 'warmup', label: 'Pemanasan' },
+  { key: 'work', label: 'Lari' },
+  { key: 'rest', label: 'Istirahat' },
+  { key: 'cooldown', label: 'Pendinginan' },
+] as const
+
+export type RunSegment = { kind: string; distance_m: number | null; duration_s: number | null }
+
+export const segmentLabel = (k?: string | null) => SEGMENT_KINDS.find((x) => x.key === k)?.label ?? 'Lari'
+
+export function segmentText(s: RunSegment) {
+  const parts: string[] = []
+  if (s.distance_m) parts.push(`${Math.round((s.distance_m / 1000) * 1000) / 1000} km`)
+  if (s.duration_s) parts.push(`${Math.round((s.duration_s / 60) * 10) / 10} mnt`)
+  return parts.join(', ')
+}
+
 export type RunRoutine = {
   id: string
   name: string
@@ -17,6 +35,7 @@ export type RunRoutine = {
   target_duration_s: number | null
   target_pace_s: number | null
   structure: string | null
+  segments?: RunSegment[] | null
 }
 
 // "5:30" -> 330 detik

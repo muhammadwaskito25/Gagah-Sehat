@@ -6,7 +6,11 @@ import ExercisePicker from './ExercisePicker'
 import Icon from './Icon'
 import type { Exercise, RoutineWithExercises } from '@/lib/types'
 
-type Item = { exerciseId: string; name: string; sets: number; reps: string; rest: number; kind?: string | null; km?: string; min?: string }
+type Item = { exerciseId: string; name: string; sets: number; reps: string; rest: number; kind?: string | null; cs?: CardioRow[] }
+type CardioRow = { km: string; min: string }
+
+const fmtKm = (m?: number | null) => (m ? String(Math.round((Number(m) / 1000) * 1000) / 1000) : '')
+const fmtMin = (sec?: number | null) => (sec ? String(Math.round((Number(sec) / 60) * 10) / 10) : '')
 
 export default function RoutineEditor({ initial }: { initial: RoutineWithExercises | null }) {
   const supabase = createClient()
@@ -22,8 +26,11 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
         sets: re.target_sets,
         reps: re.target_reps ?? '',
         rest: re.rest_seconds,
-        km: re.target_distance_m ? String(Number(re.target_distance_m) / 1000) : '',
-        min: re.target_duration_s ? String(Math.round((re.target_duration_s / 60) * 10) / 10) : '',
+        cs: re.exercises?.kind === 'cardio'
+          ? re.cardio_sets && re.cardio_sets.length
+            ? re.cardio_sets.map((c) => ({ km: fmtKm(c.distance_m), min: fmtMin(c.duration_s) }))
+            : [{ km: fmtKm(re.target_distance_m), min: fmtMin(re.target_duration_s) }]
+          : undefined,
       }))
   )
   const [picker, setPicker] = useState(false)
@@ -31,6 +38,23 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
 
   function patch(i: number, p: Partial<Item>) {
     setItems((list) => list.map((it, j) => (j === i ? { ...it, ...p } : it)))
+  }
+
+  function patchRow(i: number, r: number, p: Partial<CardioRow>) {
+    setItems((list) => list.map((it, j) => (j === i ? { ...it, cs: (it.cs ?? []).map((c, k) => (k === r ? { ...c, ...p } : c)) } : it)))
+  }
+
+  function addRow(i: number) {
+    setItems((list) => list.map((it, j) => {
+      if (j !== i) return it
+      const cs = it.cs ?? []
+      const last = cs[cs.length - 1]
+      return { ...it, cs: [...cs, last ? { ...last } : { km: '', min: '5' }] }
+    }))
+  }
+
+  function removeRow(i: number, r: number) {
+    setItems((list) => list.map((it, j) => (j === i ? { ...it, cs: (it.cs ?? []).filter((_, k) => k !== r) } : it)))
   }
 
   function move(i: number, dir: -1 | 1) {
@@ -58,16 +82,24 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
     }
     if (items.length) {
       const { error } = await supabase.from('routine_exercises').insert(
-        items.map((it, position) => ({
-          routine_id: id,
-          exercise_id: it.exerciseId,
-          position,
-          target_reps: it.kind === 'cardio' ? null : it.reps,
-          rest_seconds: it.kind === 'cardio' ? 0 : it.rest,
-          target_sets: it.kind === 'cardio' ? 1 : it.sets,
-          target_distance_m: it.kind === 'cardio' && it.km ? Number(it.km.replace(',', '.')) * 1000 : null,
-          target_duration_s: it.kind === 'cardio' && it.min ? Math.round(Number(it.min.replace(',', '.')) * 60) : null,
-        }))
+        items.map((it, position) => {
+          const cardio = it.kind === 'cardio'
+          const rows = (it.cs ?? []).map((c) => ({
+            distance_m: c.km ? Math.round(Number(c.km.replace(',', '.')) * 1000) : null,
+            duration_s: c.min ? Math.round(Number(c.min.replace(',', '.')) * 60) : null,
+          }))
+          return {
+            routine_id: id,
+            exercise_id: it.exerciseId,
+            position,
+            target_reps: cardio ? null : it.reps,
+            rest_seconds: cardio ? 0 : it.rest,
+            target_sets: cardio ? Math.max(rows.length, 1) : it.sets,
+            target_distance_m: cardio ? rows[0]?.distance_m ?? null : null,
+            target_duration_s: cardio ? rows[0]?.duration_s ?? null : null,
+            cardio_sets: cardio ? rows : null,
+          }
+        })
       )
       if (error) {
         setSaving(false)
@@ -119,15 +151,19 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
             </div>
           </div>
           {it.kind === 'cardio' ? (
-            <div className="grid grid-cols-2 gap-2">
-              <label>
-                <span className="field mb-1">Jarak (km)</span>
-                <input className="input num py-2.5 text-center text-lg" inputMode="decimal" placeholder="opsional" value={it.km ?? ''} onChange={(e) => patch(i, { km: e.target.value })} />
-              </label>
-              <label>
-                <span className="field mb-1">Durasi (menit)</span>
-                <input className="input num py-2.5 text-center text-lg" inputMode="decimal" placeholder="opsional" value={it.min ?? ''} onChange={(e) => patch(i, { min: e.target.value })} />
-              </label>
+            <div className="space-y-2">
+              <div className="grid grid-cols-[2.25rem_1fr_1fr_2.25rem] items-center gap-2 px-1 text-center text-[11px] font-semibold text-steel">
+                <span>Set</span><span>Jarak (km)</span><span>Durasi (menit)</span><span />
+              </div>
+              {(it.cs ?? []).map((c, r) => (
+                <div key={r} className="grid grid-cols-[2.25rem_1fr_1fr_2.25rem] items-center gap-2">
+                  <span className="num text-center text-lg font-semibold text-steel">{r + 1}</span>
+                  <input className="input num py-2.5 text-center text-lg" inputMode="decimal" placeholder="opsional" value={c.km} onChange={(e) => patchRow(i, r, { km: e.target.value })} />
+                  <input className="input num py-2.5 text-center text-lg" inputMode="decimal" placeholder="opsional" value={c.min} onChange={(e) => patchRow(i, r, { min: e.target.value })} />
+                  <button aria-label="Hapus set" className="flex h-9 w-9 items-center justify-center rounded-full text-steel active:bg-chalk disabled:opacity-30" disabled={(it.cs ?? []).length <= 1} onClick={() => removeRow(i, r)}><Icon name="x" size={16} /></button>
+                </div>
+              ))}
+              <button className="btn-soft btn-sm w-full" onClick={() => addRow(i)}><Icon name="plus" size={16} />Tambah set (interval)</button>
             </div>
           ) : (
           <div className="grid grid-cols-3 gap-2">
@@ -157,7 +193,7 @@ export default function RoutineEditor({ initial }: { initial: RoutineWithExercis
         onPick={(ex: Exercise) => {
           setPicker(false)
           setItems([...items, ex.kind === 'cardio'
-            ? { exerciseId: ex.id, name: ex.name, sets: 1, reps: '', rest: 0, kind: 'cardio', km: '', min: '15' }
+            ? { exerciseId: ex.id, name: ex.name, sets: 1, reps: '', rest: 0, kind: 'cardio', cs: [{ km: '', min: '15' }] }
             : { exerciseId: ex.id, name: ex.name, sets: 3, reps: '8-12', rest: 90, kind: 'strength' }])
         }}
       />

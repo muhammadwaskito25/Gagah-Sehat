@@ -106,7 +106,8 @@ export default async function RoutinesPage() {
                 <Icon name="edit" size={18} />
               </Link>
             </div>
-            {r.structure && <p className="mt-3 line-clamp-2 whitespace-pre-line text-sm leading-relaxed text-ink/80">{r.structure}</p>}
+            {r.segments && r.segments.length > 0 && <p className="mt-3 text-sm text-ink/80">{r.segments.length} set</p>}
+            {!(r.segments && r.segments.length > 0) && r.structure && <p className="mt-3 line-clamp-2 whitespace-pre-line text-sm leading-relaxed text-ink/80">{r.structure}</p>}
             <Link href={`/runs/start?routine=${r.id}`} className="btn mt-4 w-full bg-plate-red text-white">Mulai</Link>
           </article>
         ))}

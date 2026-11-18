@@ -8,7 +8,7 @@ export default async function EditRoutinePage({ params }: { params: Promise<{ id
   const supabase = await createClient()
   const { data } = await supabase
     .from('routines')
-    .select('id,name,routine_exercises(id,position,target_sets,target_reps,rest_seconds,target_distance_m,target_duration_s,exercise_id,exercises(name,kind))')
+    .select('id,name,routine_exercises(id,position,target_sets,target_reps,rest_seconds,target_distance_m,target_duration_s,cardio_sets,exercise_id,exercises(name,kind))')
     .eq('id', id)
     .single()
   if (!data) notFound()

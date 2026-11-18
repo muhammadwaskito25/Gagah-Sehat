@@ -65,7 +65,13 @@ export default function WorkoutLogger({ routine }: { routine: RoutineWithExercis
             kind: re.exercises?.kind ?? 'strength',
             rest: re.rest_seconds,
             sets: re.exercises?.kind === 'cardio'
-              ? [{ ...emptySet(), distance: re.target_distance_m ? String(Number(re.target_distance_m) / 1000) : '', duration: re.target_duration_s ? String(Math.round((re.target_duration_s / 60) * 10) / 10) : '' }]
+              ? re.cardio_sets && re.cardio_sets.length
+                ? re.cardio_sets.map((c) => ({
+                    ...emptySet(),
+                    distance: c.distance_m ? String(Math.round((Number(c.distance_m) / 1000) * 1000) / 1000) : '',
+                    duration: c.duration_s ? String(Math.round((Number(c.duration_s) / 60) * 10) / 10) : '',
+                  }))
+                : [{ ...emptySet(), distance: re.target_distance_m ? String(Number(re.target_distance_m) / 1000) : '', duration: re.target_duration_s ? String(Math.round((re.target_duration_s / 60) * 10) / 10) : '' }]
               : Array.from({ length: re.target_sets }, emptySet),
             prev: await fetchPrev(re.exercise_id),
           }))
@@ -406,7 +412,7 @@ function ExerciseBlock({
       </div>
 
       <div className="flex gap-2 p-3 pt-2">
-        <button className="btn-soft btn-sm flex-1" onClick={onAddSet}><Icon name="plus" size={16} />{cardio ? 'Tambah sesi' : 'Tambah set'}</button>
+        <button className="btn-soft btn-sm flex-1" onClick={onAddSet}><Icon name="plus" size={16} />Tambah set</button>
         {ex.sets.length > 0 && (
           <button aria-label="Hapus set terakhir" className="btn-soft btn-sm px-4 text-steel" onClick={() => onRemoveSet(ex.sets.length - 1)}>
             <Icon name="x" size={16} />

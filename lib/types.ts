@@ -40,6 +40,7 @@ export type RoutineWithExercises = {
     rest_seconds: number
     target_distance_m?: number | null
     target_duration_s?: number | null
+    cardio_sets?: { distance_m: number | null; duration_s: number | null }[] | null
     exercise_id: string
     exercises: { name: string; kind?: string | null } | null
   }[]

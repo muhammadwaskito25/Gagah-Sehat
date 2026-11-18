@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Icon from './Icon'
-import { paceText, runTypeLabel, targetText, type RunRoutine } from '@/lib/run'
+import { paceText, runTypeLabel, segmentLabel, segmentText, targetText, type RunRoutine } from '@/lib/run'
 
 const KEY = 'gagah-run-session'
 type Saved = { routineId: string | null; startedAt: string | null; runningSince: number | null; accumulated: number; laps: number[] }
@@ -64,6 +64,9 @@ export default function RunSession({ routine }: { routine: RunRoutine | null }) 
   const elapsed = st.accumulated + (st.runningSince ? now - st.runningSince : 0)
   const lastLap = st.laps[st.laps.length - 1] ?? 0
   const started = !!st.startedAt
+  const segs = routine?.segments ?? []
+  const cur = st.laps.length
+  const curSeg = segs[cur]
 
   const start = () => setSt({ ...st, startedAt: st.startedAt ?? new Date().toISOString(), runningSince: Date.now() })
   const pause = () => setSt({ ...st, accumulated: elapsed, runningSince: null })
@@ -87,7 +90,8 @@ export default function RunSession({ routine }: { routine: RunRoutine | null }) 
     if (!dist || !sec) return alert('Isi jarak dan waktu dulu')
     setSaving(true)
     const lapsText = st.laps.length
-      ? 'Lap: ' + st.laps.map((l, i) => clock(l - (st.laps[i - 1] ?? 0))).join(', ')
+      ? (segs.length ? 'Set: ' : 'Lap: ') +
+        st.laps.map((l, i) => `${segs[i] ? segmentLabel(segs[i].kind) + ' ' : ''}${clock(l - (st.laps[i - 1] ?? 0))}`).join(', ')
       : null
     const { error } = await createClient().from('runs').insert({
       name: routine?.name ?? 'Lari',
@@ -120,7 +124,21 @@ export default function RunSession({ routine }: { routine: RunRoutine | null }) 
       <h1 className="title mt-4">{routine?.name ?? 'Lari bebas'}</h1>
       {routine && targetText(routine) && <p className="mt-2 text-[15px] text-steel">Target {targetText(routine)}</p>}
 
-      {routine?.structure && (
+      {segs.length > 0 && (
+        <ol className="list mt-5">
+          {segs.map((g, i) => (
+            <li key={i} className={`flex items-center gap-3 px-4 py-3 text-[15px] ${i === cur && started ? 'bg-plate-red/5' : ''}`}>
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold ${i < cur ? 'bg-plate-green text-white' : i === cur && started ? 'bg-plate-red text-white' : 'bg-chalk text-steel'}`}>
+                {i < cur ? <Icon name="check" size={13} strokeWidth={3} /> : i + 1}
+              </span>
+              <span className={`flex-1 ${g.kind === 'rest' ? 'text-steel' : 'font-semibold'} ${i < cur ? 'line-through opacity-50' : ''}`}>{segmentLabel(g.kind)}</span>
+              <span className="num text-steel">{segmentText(g)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {segs.length === 0 && routine?.structure && (
         <ol className="list mt-5">
           {routine.structure.split('\n').filter((l) => l.trim()).map((l, i) => (
             <li key={i} className="flex gap-3 px-4 py-3 text-[15px]">
@@ -135,7 +153,10 @@ export default function RunSession({ routine }: { routine: RunRoutine | null }) 
         <>
           <div className="my-auto py-10 text-center">
             <div className="num text-[88px] leading-none tracking-tight">{clock(elapsed)}</div>
-            {st.laps.length > 0 && <div className="mt-3 text-steel">Lap {st.laps.length + 1}: <span className="num text-lg text-ink">{clock(elapsed - lastLap)}</span></div>}
+            {curSeg && started && (
+              <div className="mt-3 text-steel">Set {cur + 1}, {segmentLabel(curSeg.kind)}: <span className="num text-lg text-ink">{clock(elapsed - lastLap)}</span></div>
+            )}
+            {!curSeg && st.laps.length > 0 && <div className="mt-3 text-steel">Lap {st.laps.length + 1}: <span className="num text-lg text-ink">{clock(elapsed - lastLap)}</span></div>}
           </div>
 
           {st.laps.length > 0 && (
@@ -144,7 +165,7 @@ export default function RunSession({ routine }: { routine: RunRoutine | null }) 
                 const i = st.laps.length - 1 - ri
                 return (
                   <div key={i} className="flex justify-between px-4 py-2.5">
-                    <span className="text-steel">Lap {i + 1}</span>
+                    <span className="text-steel">{segs[i] ? `Set ${i + 1}, ${segmentLabel(segs[i].kind)}` : `Lap ${i + 1}`}</span>
                     <span className="num text-lg">{clock(l - (st.laps[i - 1] ?? 0))}</span>
                   </div>
                 )
@@ -157,7 +178,7 @@ export default function RunSession({ routine }: { routine: RunRoutine | null }) 
               <button className="btn col-span-2 h-16 bg-plate-red text-lg text-white" onClick={start}>Mulai</button>
             ) : st.runningSince ? (
               <>
-                <button className="btn-ghost h-16 text-lg" onClick={lap}>Lap</button>
+                <button className="btn-ghost h-16 text-lg" onClick={lap}>{curSeg ? 'Set berikutnya' : 'Lap'}</button>
                 <button className="btn-dark h-16 text-lg" onClick={pause}>Jeda</button>
               </>
             ) : (
